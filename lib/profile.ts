@@ -1,15 +1,21 @@
 import { apiRequest } from './api';
-import { StructuredPortfolio } from '@/types/portfolio';
+import { StructuredPortfolio, PipelineStatus } from '@/types/portfolio';
 
 export interface ResumeResponse {
     id: number;
     original_filename: string;
     uploaded_at: string;
     file: string;
-    extracted_text?: string; // Optional as it might not be present immediately
+    extracted_text?: string;
 }
 
 export const profile = {
+    getStatus: async () => {
+        return apiRequest<PipelineStatus>('/api/profile/resume/status/', {
+            method: 'GET',
+        });
+    },
+
     uploadResume: async (file: File) => {
         const formData = new FormData();
         formData.append('file', file);
@@ -39,11 +45,23 @@ export const profile = {
     },
 
     updateStructuredPortfolio: async (section: keyof StructuredPortfolio, data: any) => {
-        // Construct the patch body dynamically based on the section
         const patchBody = { [section]: data };
         return apiRequest<StructuredPortfolio>('/api/profile/portfolio/structured/', {
             method: 'PATCH',
             body: patchBody,
+        });
+    },
+
+    saveFullPortfolio: async (data: StructuredPortfolio) => {
+        return apiRequest<StructuredPortfolio>('/api/profile/portfolio/structured/', {
+            method: 'PATCH',
+            body: data,
+        });
+    },
+
+    confirmReview: async () => {
+        return apiRequest<any>('/api/profile/portfolio/confirm/', {
+            method: 'POST',
         });
     }
 };

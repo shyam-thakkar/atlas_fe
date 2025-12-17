@@ -3,13 +3,14 @@
 import React, { useEffect, useState } from 'react';
 import { profile, ResumeResponse } from '@/lib/profile';
 import { ResumeUpload } from '@/components/ResumeUpload';
-import { ResumePreview } from '@/components/ResumePreview';
+
 import { ResumeStatus } from '@/components/ResumeStatus';
-import Link from 'next/link';
+import { useResumePolling } from '@/hooks/useResumePolling';
 
 export default function ResumePage() {
     const [resumeData, setResumeData] = useState<ResumeResponse | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const { status } = useResumePolling();
 
     useEffect(() => {
         const fetchResume = async () => {
@@ -19,7 +20,7 @@ export default function ResumePage() {
                     setResumeData(data);
                 }
             } catch (e) {
-                // Fail silently, user just hasn't uploaded specific file yet
+                // Fail silently
             } finally {
                 setIsLoading(false);
             }
@@ -32,8 +33,14 @@ export default function ResumePage() {
         setResumeData(data);
     };
 
+    // 2️⃣ Upload Section: Enabled only if status ∈ {uploaded, completed, failed}
+    // "uploaded" is debatable as "ready". 
+    // Usually: if status is 'analyzing' or 'extracting' (processing), we disable upload.
+    const isProcessing = status === 'analyzing' || status === 'extracting' || status === 'review_required';
+    const canUpload = !isProcessing;
+
     return (
-        <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500">
+        <div className="w-full h-full p-8 space-y-8 animate-in fade-in duration-500 overflow-y-auto">
 
             {/* Header Section */}
             <div className="border-b border-gray-100 pb-6 ml-1">
@@ -48,12 +55,13 @@ export default function ResumePage() {
 
                 {/* Left Column: Upload */}
                 <div className="lg:col-span-7 space-y-8">
-                    <section>
+                    <section className={!canUpload ? "opacity-50 pointer-events-none grayscale transition-all" : "transition-all"}>
                         <div className="flex items-center justify-between mb-4 px-1">
                             <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                                 <span className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-900 text-white text-xs">1</span>
                                 Upload Resume
                             </h2>
+                            {!canUpload && <span className="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded">Processing in progress...</span>}
                         </div>
                         <div className="bg-white p-1 rounded-2xl shadow-[0_2px_12px_-4px_rgba(0,0,0,0.08)]">
                             <ResumeUpload
@@ -95,14 +103,7 @@ export default function ResumePage() {
                     {isLoading ? (
                         <div className="h-64 bg-gray-50 rounded-xl animate-pulse border border-gray-100" />
                     ) : resumeData ? (
-                        <>
-                            <ResumePreview data={resumeData} />
-
-                            {/* Status & Action */}
-                            <div className="pt-4">
-                                <ResumeStatus />
-                            </div>
-                        </>
+                        <ResumeStatus resumeData={resumeData} />
                     ) : (
                         <div className="border border-dashed border-gray-200 rounded-xl p-8 text-center bg-gray-50/50">
                             <div className="mx-auto w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">

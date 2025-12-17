@@ -1,5 +1,7 @@
 import React from 'react';
 import { ProjectItem } from '@/types/portfolio';
+import { AutoResizeTextarea } from '@/components/ui/AutoResizeTextarea';
+import { StringArrayInput } from '@/components/ui/StringArrayInput';
 
 interface ProjectsEditorProps {
     data: ProjectItem[] | null;
@@ -35,32 +37,32 @@ export function ProjectsEditor({ data, onChange }: ProjectsEditorProps) {
                     </div>
                     <div className="mb-4">
                         <label className="text-xs text-gray-500 font-bold uppercase tracking-wide block mb-1.5">Description</label>
-                        <textarea
+                        <AutoResizeTextarea
                             value={proj.description || ''}
                             onChange={e => {
                                 const newProj = [...projects];
                                 newProj[i] = { ...newProj[i], description: e.target.value };
                                 onChange(newProj);
                             }}
-                            rows={3}
-                            className="w-full text-sm px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition-all resize-y"
+                            className="w-full text-sm px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition-all"
                             placeholder="A brief overview of the project..."
+                            rows={2}
                         />
                     </div>
                     <div className="mb-4">
                         <label className="text-xs text-gray-500 font-bold uppercase tracking-wide block mb-1.5">Tech Stack</label>
-                        <input
-                            type="text" value={proj.technologies?.join(', ') || ''}
-                            onChange={e => {
+                        <StringArrayInput
+                            value={proj.technologies}
+                            onChange={(newTechs) => {
                                 const newProj = [...projects];
-                                newProj[i] = { ...newProj[i], technologies: e.target.value.split(',').map(s => s.trim()).filter(Boolean) };
+                                newProj[i] = { ...newProj[i], technologies: newTechs };
                                 onChange(newProj);
                             }}
                             className="w-full text-sm px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition-all"
                             placeholder="React, Node.js, Python..."
                         />
                         <div className="flex flex-wrap gap-1.5 mt-2">
-                            {proj.technologies?.map((tech, idx) => (
+                            {proj.technologies?.map(s => s.trim()).filter(Boolean).map((tech, idx) => (
                                 <span key={idx} className="text-[11px] px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full font-medium">{tech}</span>
                             ))}
                         </div>

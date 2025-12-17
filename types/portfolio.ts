@@ -18,7 +18,7 @@ export interface ExperienceItem {
     start_date: string;
     end_date: string | null;
     summary: string;
-    technologies?: string[]; // The JSON didn't explicitly show this in experience items but it's good to keep optional if backend adds it, or remove if strict. The user JSON didn't show technologies in experience.
+    technologies?: string[]; 
 }
 
 export interface ProjectItem {
@@ -41,4 +41,24 @@ export interface StructuredPortfolio {
     experience: ExperienceItem[];
     projects: ProjectItem[];
     about: AboutSection;
+}
+
+// Updated based on User Summary
+export type PipelineStatusEnum = 
+    | 'uploaded' 
+    | 'raw_extracting' 
+    | 'raw_extracted' 
+    | 'structure_extracting' 
+    | 'structure_extracted' 
+    | 'review_required' 
+    | 'completed' 
+    | 'failed';
+
+export interface PipelineStatus {
+    status: PipelineStatusEnum;
+    message: string;
+    progress: number;
+    can_review: boolean;
+    can_publish: boolean;
+    missing_items?: string[];
 }

@@ -31,7 +31,7 @@ export function PortfolioPreview({ data }: PortfolioPreviewProps) {
                 </div>
             </section>
 
-             <hr className="border-gray-100" />
+            <hr className="border-gray-100" />
 
             {/* Experience */}
             <section>
@@ -54,7 +54,7 @@ export function PortfolioPreview({ data }: PortfolioPreviewProps) {
             <hr className="border-gray-100" />
 
             {/* Projects */}
-             <section>
+            <section>
                 <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Projects</h3>
                 <div className="space-y-4">
                     {data.projects.length > 0 ? data.projects.map((proj, i) => (
@@ -73,6 +73,16 @@ export function PortfolioPreview({ data }: PortfolioPreviewProps) {
                         </div>
                     )) : <span className="text-gray-400 text-sm">No projects listed</span>}
                 </div>
+            </section>
+
+            <hr className="border-gray-100" />
+
+            {/* About */}
+            <section>
+                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">About</h3>
+                <p className="text-xs text-gray-500 leading-relaxed whitespace-pre-wrap">
+                    {data.about.long_bio || 'No bio available'}
+                </p>
             </section>
         </div>
     );

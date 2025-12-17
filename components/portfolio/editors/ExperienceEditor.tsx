@@ -1,6 +1,7 @@
 import React from 'react';
 import { ExperienceItem } from '@/types/portfolio';
 import { DateSelector } from '@/components/ui/DateSelector';
+import { AutoResizeTextarea } from '@/components/ui/AutoResizeTextarea';
 
 interface ExperienceEditorProps {
     data: ExperienceItem[] | null;
@@ -79,16 +80,16 @@ export function ExperienceEditor({ data, onChange }: ExperienceEditorProps) {
                     </div>
                     <div>
                         <label className="text-xs text-gray-500 font-bold uppercase tracking-wide block mb-1.5">Summary</label>
-                        <textarea
+                        <AutoResizeTextarea
                             value={exp.summary || ''}
                             onChange={e => {
                                 const newExp = [...experience];
                                 newExp[i] = { ...newExp[i], summary: e.target.value };
                                 onChange(newExp);
                             }}
-                            rows={4}
-                            className="w-full text-sm px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition-all resize-y leading-relaxed"
+                            className="w-full text-sm px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition-all leading-relaxed"
                             placeholder="Describe your responsibilities and achievements..."
+                            rows={3}
                         />
                     </div>
                 </div>

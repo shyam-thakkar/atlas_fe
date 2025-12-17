@@ -1,95 +1,59 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { apiGetWithETag } from '@/lib/api';
-
-type ResumeStatus = 'uploaded' | 'extracting' | 'extracted' | 'analyzing' | 'generated' | 'failed';
-
-interface PollingState {
-    status: ResumeStatus | null;
-    message: string;
-    isComplete: boolean;
-    isFailed: boolean;
-    error: string | null;
-}
-
-const STATUS_MESSAGES: Record<string, string> = {
-    uploaded: 'Resume uploaded',
-    extracting: 'Extracting text from resume…',
-    extracted: 'Text extracted',
-    analyzing: 'Analyzing resume data…',
-    generated: 'Ready to continue',
-    failed: 'Processing failed',
-};
+import { profile } from '@/lib/profile';
+import { PipelineStatus } from '@/types/portfolio';
 
 export function useResumePolling() {
-    const [state, setState] = useState<PollingState>({
-        status: null,
+    const [state, setState] = useState<PipelineStatus>({
+        status: 'uploaded', // Default initial
         message: 'Initializing...',
-        isComplete: false,
-        isFailed: false,
-        error: null,
+        progress: 0,
+        can_review: false,
+        can_publish: false,
+        missing_items: []
     });
 
-    // Store ETag in ref to persist across renders without triggering effects
-    const etagRef = useRef<string | null>(null);
+    const [isFailed, setIsFailed] = useState(false);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const isMountedRef = useRef(true);
-
-    // Helper to update state safely
-    const updateState = (newStatus: ResumeStatus) => {
-        const isComplete = newStatus === 'generated';
-        const isFailed = newStatus === 'failed';
-
-        setState({
-            status: newStatus,
-            message: STATUS_MESSAGES[newStatus] || 'Processing...',
-            isComplete,
-            isFailed,
-            error: isFailed ? 'Processing failed' : null,
-        });
-
-        return { isComplete, isFailed };
-    };
 
     const poll = useCallback(async () => {
         if (!isMountedRef.current) return;
 
         try {
-            const result = await apiGetWithETag<{ status: ResumeStatus }>('/api/profile/resume/status/', etagRef.current);
+            const result = await profile.getStatus();
 
             if (!isMountedRef.current) return;
 
-            if (result.status === 304) {
-                // No change, just schedule next poll
-                schedulePoll();
+            setState(result);
+
+            // Determine if we should stop polling
+            // We stop if it's 'completed' (fully done) or 'failed'.
+            // However, user said "Poll every 1.5s during processing". 
+            // 'review_required' is a "halt" state waiting for user action, but maybe we still poll? 
+            // Usually if action is required, status won't change until action is taken.
+            // But let's keep polling lightly or stop. 
+            // The prompt says "Poll every ~1.5s during processing."
+            // 'uploaded', 'extracting', 'analyzing' are definitely processing.
+            // 'review_required' implies processing paused.
+            // 'completed' implies done.
+            // 'failed' implies stop.
+
+            if (result.status === 'failed') {
+                setIsFailed(true);
                 return;
             }
 
-            if (result.status === 200 && result.data) {
-                const newStatus = result.data.status;
-
-                // Update ETag
-                if (result.etag) {
-                    etagRef.current = result.etag;
-                }
-
-                // Update UI State
-                const { isComplete, isFailed } = updateState(newStatus);
-
-                // Stop polling if complete or failed
-                if (isComplete || isFailed) {
-                    return;
-                }
-            } else {
-                // Unexpected status code? Just retry.
+            if (result.status === 'completed') {
+                // Done.
+                return;
             }
 
+            // Schedule next poll
             schedulePoll();
 
         } catch (error) {
             console.error("Polling error:", error);
-            // Don't stop polling on transient network errors immediately, 
-            // but maybe we should if 404/500 persists. 
-            // For now, retry safely.
+            // On error, maybe retry a bit?
             if (isMountedRef.current) {
                 schedulePoll();
             }
@@ -103,25 +67,20 @@ export function useResumePolling() {
 
     useEffect(() => {
         isMountedRef.current = true;
-
-        // Start polling immediately
         poll();
-
         return () => {
             isMountedRef.current = false;
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-            }
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
         };
     }, [poll]);
 
     return {
         ...state,
+        isFailed,
         retry: () => {
-            // Reset state and restart polling
-            setState(prev => ({ ...prev, isFailed: false, error: null, message: 'Retrying...' }));
-            etagRef.current = null; // Clear ETag to force fresh fetch
+            setIsFailed(false);
             poll();
-        }
+        },
+        refresh: poll // Allow manual refresh
     };
 }
