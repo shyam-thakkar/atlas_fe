@@ -1,16 +1,32 @@
 import React, { useState } from 'react';
-import { useResumePolling } from '@/hooks/useResumePolling';
 import Link from 'next/link';
 import { PortfolioReviewModal } from './PortfolioReviewModal';
 import { ResumeResponse } from '@/lib/profile';
+import { PipelineStatusEnum } from '@/types/portfolio';
 
 interface ResumeStatusProps {
     resumeData?: ResumeResponse | null;
+    status: PipelineStatusEnum;
+    message: string;
+    progress: number;
+    can_review: boolean;
+    can_publish: boolean;
+    isFailed: boolean;
+    retry: () => void;
+    missing_items?: string[];
 }
 
-export function ResumeStatus({ resumeData }: ResumeStatusProps) {
-    // 1️⃣ Single Source of Truth: All props come from hook
-    const { status, message, progress: backendProgress, can_review, can_publish, isFailed, retry, missing_items } = useResumePolling();
+export function ResumeStatus({ 
+    resumeData,
+    status,
+    message,
+    progress: backendProgress,
+    can_review,
+    can_publish,
+    isFailed,
+    retry,
+    missing_items
+}: ResumeStatusProps) {
     const [isReviewOpen, setIsReviewOpen] = useState(false);
 
     // Map status to progress for granular feedback
@@ -25,6 +41,7 @@ export function ResumeStatus({ resumeData }: ResumeStatusProps) {
             case 'review_required': return 90;
             case 'completed': return 100;
             case 'failed': return 100;
+            case 'idle': return 0;
             default: return backendProgress || 5; 
         }
     };

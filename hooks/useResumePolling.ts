@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { profile } from '@/lib/profile';
-import { PipelineStatus } from '@/types/portfolio';
+import { PipelineStatus, PipelineStatusEnum } from '@/types/portfolio';
 
 export function useResumePolling() {
     const [state, setState] = useState<PipelineStatus>({
-        status: 'uploaded', // Default initial
+        status: 'idle', // Default initial (no resume)
         message: 'Initializing...',
         progress: 0,
         can_review: false,
@@ -26,36 +26,35 @@ export function useResumePolling() {
 
             setState(result);
 
-            // Determine if we should stop polling
-            // We stop if it's 'completed' (fully done) or 'failed'.
-            // However, user said "Poll every 1.5s during processing". 
-            // 'review_required' is a "halt" state waiting for user action, but maybe we still poll? 
-            // Usually if action is required, status won't change until action is taken.
-            // But let's keep polling lightly or stop. 
-            // The prompt says "Poll every ~1.5s during processing."
-            // 'uploaded', 'extracting', 'analyzing' are definitely processing.
-            // 'review_required' implies processing paused.
-            // 'completed' implies done.
-            // 'failed' implies stop.
-
             if (result.status === 'failed') {
                 setIsFailed(true);
                 return;
             }
 
             if (result.status === 'completed') {
-                // Done.
                 return;
             }
 
             // Schedule next poll
             schedulePoll();
 
-        } catch (error) {
+        } catch (error: any) {
             console.error("Polling error:", error);
-            // On error, maybe retry a bit?
+
             if (isMountedRef.current) {
-                schedulePoll();
+                // If 404, it means no resume exists -> IDLE state (allow upload)
+                if (error.status === 404) {
+                    setState({
+                        status: 'idle',
+                        message: 'Ready for upload',
+                        progress: 0,
+                        can_review: false,
+                        can_publish: false,
+                        missing_items: []
+                    });
+                } else {
+                    schedulePoll();
+                }
             }
         }
     }, []);
@@ -63,6 +62,22 @@ export function useResumePolling() {
     const schedulePoll = useCallback(() => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
         timeoutRef.current = setTimeout(poll, 1500);
+    }, [poll]);
+
+    const reset = useCallback((optimisticStatus?: PipelineStatusEnum) => {
+        setIsFailed(false);
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+        if (optimisticStatus) {
+            setState(prev => ({
+                ...prev,
+                status: optimisticStatus,
+                message: 'Processing...',
+                progress: 5
+            }));
+        }
+
+        poll();
     }, [poll]);
 
     useEffect(() => {
@@ -77,10 +92,8 @@ export function useResumePolling() {
     return {
         ...state,
         isFailed,
-        retry: () => {
-            setIsFailed(false);
-            poll();
-        },
-        refresh: poll // Allow manual refresh
+        retry: () => reset(), // Alias for backward compatibility / simple retry
+        reset, // Expose reset for optimistic updates
+        refresh: poll
     };
 }

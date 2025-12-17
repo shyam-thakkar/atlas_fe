@@ -41,6 +41,8 @@ export function PortfolioManager({ onFinish, isModal = false }: PortfolioManager
                 console.error("Failed to load portfolio", err);
                 if (err.message?.includes('409') || err.status === 409) {
                     setError("Processing not finished. Please wait for the analysis to complete.");
+                } else if (err.status === 404) {
+                    setError("No resume found. Please upload a resume first to generate your portfolio.");
                 } else {
                     setError("Failed to load portfolio data. Please try again.");
                 }
@@ -152,12 +154,30 @@ export function PortfolioManager({ onFinish, isModal = false }: PortfolioManager
 
                     <div className="flex items-center gap-3">
                         {!isEditing ? (
-                            <button
-                                onClick={toggleEdit}
-                                className="px-6 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg font-medium text-sm hover:bg-gray-50 transition-all shadow-sm"
-                            >
-                                Edit Portfolio
-                            </button>
+                            <>
+                                <button
+                                    onClick={toggleEdit}
+                                    className="px-6 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg font-medium text-sm hover:bg-gray-50 transition-all shadow-sm"
+                                >
+                                    Edit Portfolio
+                                </button>
+                                {onFinish && (
+                                    <button
+                                        onClick={handleSave}
+                                        disabled={isSaving || !editedData}
+                                        className="px-6 py-2.5 bg-indigo-600 text-white rounded-lg font-medium text-sm shadow-sm hover:bg-indigo-700 transition-all flex items-center gap-2"
+                                    >
+                                        {isSaving ? (
+                                            <>
+                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                Finalizing...
+                                            </>
+                                        ) : (
+                                            <>Looks Good, Continue</>
+                                        )}
+                                    </button>
+                                )}
+                            </>
                         ) : (
                             <>
                                 <button
@@ -196,15 +216,28 @@ export function PortfolioManager({ onFinish, isModal = false }: PortfolioManager
                         </div>
                     ) : error ? (
                         <div className="h-full flex items-center justify-center">
-                            <div className="max-w-md text-center p-6 bg-red-50 rounded-xl border border-red-100">
-                                <p className="text-red-600 font-medium mb-2">{error}</p>
-                                <button
-                                    onClick={() => window.location.reload()}
-                                    className="text-sm text-red-700 underline hover:text-red-800"
-                                >
-                                    Reload Page
-                                </button>
-                            </div>
+                            {error.includes('resume') ? (
+                                <div className="max-w-md text-center p-8 bg-indigo-50 rounded-2xl border border-indigo-100">
+                                    <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                                    </div>
+                                    <h3 className="text-lg font-bold text-indigo-900 mb-2">Resume Required</h3>
+                                    <p className="text-indigo-700 mb-6 text-sm">Please upload your resume to generate your portfolio data.</p>
+                                    <a href="/dashboard/resume" className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white font-medium text-sm rounded-lg hover:bg-indigo-700 transition-colors shadow-sm cursor-pointer">
+                                        Go to Resume Upload
+                                    </a>
+                                </div>
+                            ) : (
+                                <div className="max-w-md text-center p-6 bg-red-50 rounded-xl border border-red-100">
+                                    <p className="text-red-600 font-medium mb-2">{error}</p>
+                                    <button
+                                        onClick={() => window.location.reload()}
+                                        className="text-sm text-red-700 underline hover:text-red-800"
+                                    >
+                                        Reload Page
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     ) : editedData ? (
                         <div className="w-full animate-in fade-in slide-in-from-right-4 duration-300 key={currentStep}">

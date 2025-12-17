@@ -43,8 +43,8 @@ export interface StructuredPortfolio {
     about: AboutSection;
 }
 
-// Updated based on User Summary
 export type PipelineStatusEnum = 
+    | 'idle'
     | 'uploaded' 
     | 'raw_extracting' 
     | 'raw_extracted' 

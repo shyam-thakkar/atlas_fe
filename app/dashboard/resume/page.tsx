@@ -10,7 +10,8 @@ import { useResumePolling } from '@/hooks/useResumePolling';
 export default function ResumePage() {
     const [resumeData, setResumeData] = useState<ResumeResponse | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const { status } = useResumePolling();
+    const pollingState = useResumePolling();
+    const { status, reset } = pollingState;
 
     useEffect(() => {
         const fetchResume = async () => {
@@ -31,12 +32,13 @@ export default function ResumePage() {
 
     const handleUploadSuccess = (data: ResumeResponse) => {
         setResumeData(data);
+        reset('uploaded'); // Optimistic update
     };
 
     // 2️⃣ Upload Section: Enabled only if status ∈ {uploaded, completed, failed}
     // "uploaded" is debatable as "ready". 
     // Usually: if status is 'analyzing' or 'extracting' (processing), we disable upload.
-    const isProcessing = status === 'analyzing' || status === 'extracting' || status === 'review_required';
+    const isProcessing = ['uploaded', 'raw_extracting', 'raw_extracted', 'structure_extracting', 'structure_extracted'].includes(status);
     const canUpload = !isProcessing;
 
     return (
@@ -103,7 +105,7 @@ export default function ResumePage() {
                     {isLoading ? (
                         <div className="h-64 bg-gray-50 rounded-xl animate-pulse border border-gray-100" />
                     ) : resumeData ? (
-                        <ResumeStatus resumeData={resumeData} />
+                        <ResumeStatus resumeData={resumeData} {...pollingState} />
                     ) : (
                         <div className="border border-dashed border-gray-200 rounded-xl p-8 text-center bg-gray-50/50">
                             <div className="mx-auto w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
