@@ -5,34 +5,39 @@ interface AutoResizeTextareaProps extends TextareaHTMLAttributes<HTMLTextAreaEle
     value: string;
 }
 
-export function AutoResizeTextarea({ value, className, ...props }: AutoResizeTextareaProps) {
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
+export const AutoResizeTextarea = React.forwardRef<HTMLTextAreaElement, AutoResizeTextareaProps>(
+    ({ value, className, ...props }, ref) => {
+        const internalRef = useRef<HTMLTextAreaElement>(null);
 
-    const adjustHeight = () => {
-        const textarea = textareaRef.current;
-        if (!textarea) return;
+        const adjustHeight = () => {
+            const textarea = (ref as React.MutableRefObject<HTMLTextAreaElement>)?.current || internalRef.current;
+            if (!textarea) return;
+            textarea.style.height = 'auto';
+            textarea.style.height = `${textarea.scrollHeight}px`;
+        };
 
-        // Reset height to auto to sort-of "shrink" if content is deleted
-        textarea.style.height = 'auto';
-        // Set new height based on scrollHeight
-        textarea.style.height = `${textarea.scrollHeight}px`;
-    };
+        useEffect(() => {
+            adjustHeight();
+        }, [value]);
 
-    // Adjust height on value change
-    useEffect(() => {
-        adjustHeight();
-    }, [value]);
+        return (
+            <textarea
+                {...props}
+                ref={(node) => {
+                    // Maintain both refs
+                    internalRef.current = node;
+                    if (typeof ref === 'function') ref(node);
+                    else if (ref) (ref as React.MutableRefObject<HTMLTextAreaElement | null>).current = node;
+                }}
+                value={value}
+                className={`resize-none overflow-hidden ${className}`}
+                onChange={(e) => {
+                    adjustHeight();
+                    if (props.onChange) props.onChange(e);
+                }}
+            />
+        );
+    }
+);
 
-    return (
-        <textarea
-            {...props}
-            ref={textareaRef}
-            value={value}
-            className={`resize-none overflow-hidden ${className}`}
-            onChange={(e) => {
-                adjustHeight();
-                if (props.onChange) props.onChange(e);
-            }}
-        />
-    );
-}
+AutoResizeTextarea.displayName = "AutoResizeTextarea";

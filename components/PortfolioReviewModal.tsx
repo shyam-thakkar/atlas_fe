@@ -20,7 +20,7 @@ export function PortfolioReviewModal({ isOpen, onClose, onFinish }: PortfolioRev
             <div className="relative w-full max-w-[90vw]">
                 <button
                     onClick={onClose}
-                    className="absolute -top-12 right-0 text-white/50 hover:text-white transition-colors flex items-center gap-2"
+                    className="absolute -top-12 right-0 mt-4 text-white/50 hover:text-white transition-colors flex items-center gap-2"
                 >
                     <span className="text-sm font-medium">Cancel Analysis</span>
                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>

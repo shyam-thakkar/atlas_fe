@@ -63,5 +63,20 @@ export const profile = {
         return apiRequest<any>('/api/profile/portfolio/confirm/', {
             method: 'POST',
         });
-    }
+    },
+
+    // Search for a technology by exact code_name match
+    searchTech: async (query: string) => {
+        return apiRequest<{
+            id: number;
+            display_name: string;
+            code_name: string;
+            icon_path: string;
+            icon_source_url?: string;
+            doc_url?: string;
+            color_variant?: string;
+        } | { error: string }>(`/api/profile/tech/search/?q=${encodeURIComponent(query)}`, {
+            method: 'GET',
+        });
+    },
 };

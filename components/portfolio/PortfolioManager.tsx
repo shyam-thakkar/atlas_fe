@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StructuredPortfolio } from '@/types/portfolio';
 import { profile } from '@/lib/profile';
 import { HeroEditor } from './editors/HeroEditor';
+import { SocialsEditor } from './editors/SocialsEditor';
 import { TechStackEditor } from './editors/TechStackEditor';
 import { ExperienceEditor } from './editors/ExperienceEditor';
 import { ProjectsEditor } from './editors/ProjectsEditor';
@@ -10,24 +11,34 @@ import { AboutEditor } from './editors/AboutEditor';
 interface PortfolioManagerProps {
     onFinish?: () => void;
     isModal?: boolean;
+    onDataChange?: (data: StructuredPortfolio | null) => void;
+    defaultEdit?: boolean;
 }
 
 const STEPS = [
-    { id: 'hero', title: 'Start with the Basics', description: 'Introduce yourself with a punchy headline and bio.' },
-    { id: 'tech_stack', title: 'Your Arsenal', description: 'List the technologies and tools you excel at.' },
-    { id: 'experience', title: 'Professional Journey', description: 'Where have you worked? What did you accomplish?' },
-    { id: 'projects', title: 'Key Projects', description: 'Showcase your best work and side projects.' },
-    { id: 'about', title: 'The Full Story', description: 'Go into more detail about your background and philosophy.' },
+    { id: 'hero', title: 'Hero Section', description: 'Your name, headline, and profile image.' },
+    { id: 'about', title: 'Bio & Overview', description: 'Your professional introduction with tech badges.' },
+    { id: 'socials', title: 'Social Links', description: 'Your social media profiles and contact information.' },
+    { id: 'tech_stack', title: 'Tech Stack', description: 'The technologies and tools you excel at.' },
+    { id: 'experience', title: 'Experience', description: 'Where have you worked? What did you accomplish?' },
+    { id: 'projects', title: 'Projects', description: 'Showcase your best work and side projects.' },
 ];
 
-export function PortfolioManager({ onFinish, isModal = false }: PortfolioManagerProps) {
+export function PortfolioManager({ onFinish, isModal = false, onDataChange, defaultEdit = false }: PortfolioManagerProps) {
     const [data, setData] = useState<StructuredPortfolio | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);
     const [isSaving, setIsSaving] = useState(false);
-    const [isEditing, setIsEditing] = useState(false); // Default to read-only
+    const [isEditing, setIsEditing] = useState(defaultEdit);
     const [editedData, setEditedData] = useState<StructuredPortfolio | null>(null);
     const [error, setError] = useState<string | null>(null);
+
+    // Notify parent of data changes
+    useEffect(() => {
+        if (onDataChange) {
+            onDataChange(editedData);
+        }
+    }, [editedData, onDataChange]);
 
     useEffect(() => {
         setIsLoading(true);
@@ -52,7 +63,8 @@ export function PortfolioManager({ onFinish, isModal = false }: PortfolioManager
 
     const handleUpdate = (section: keyof StructuredPortfolio, newData: any) => {
         if (!editedData) return;
-        setEditedData({ ...editedData, [section]: newData });
+        const updated = { ...editedData, [section]: newData };
+        setEditedData(updated);
     };
 
     const handleSave = async () => {
@@ -105,9 +117,9 @@ export function PortfolioManager({ onFinish, isModal = false }: PortfolioManager
     return (
         <div className={containerInfoClass}>
             {/* LEFT PANEL: NAVIGATION */}
-            <div className="w-[280px] bg-gray-50 border-r border-gray-200 flex flex-col h-full flex-shrink-0">
-                <div className="h-16 flex items-center px-6 border-b border-gray-200 bg-white/50 backdrop-blur sticky top-0 z-10">
-                    <h3 className="text-sm font-bold text-gray-900 tracking-wide uppercase">Portfolio Sections</h3>
+            <div className="w-[280px] bg-gray-50 dark:bg-zinc-900 border-r border-gray-200 dark:border-zinc-800 flex flex-col h-full flex-shrink-0">
+                <div className="h-16 flex items-center px-6 border-b border-gray-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-950/50 backdrop-blur sticky top-0 z-10">
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 tracking-wide uppercase">Portfolio Sections</h3>
                 </div>
                 <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
                     <nav className="space-y-2">
@@ -115,18 +127,19 @@ export function PortfolioManager({ onFinish, isModal = false }: PortfolioManager
                             <button
                                 key={step.id}
                                 onClick={() => setCurrentStep(index)}
-                                className={`w-full flex items-start p-4 rounded-xl text-left transition-all ${currentStep === index
-                                    ? 'bg-white shadow-md border border-gray-200 ring-1 ring-black/5 scale-[1.02]'
-                                    : 'hover:bg-gray-100 hover:scale-[1.01] text-gray-600'
-                                    }`}
+                                className={`w-full flex items-start p-4 rounded-xl text-left transition-all ${
+                                    currentStep === index
+                                        ? 'bg-white dark:bg-zinc-800 shadow-md border border-gray-200 dark:border-zinc-700 ring-1 ring-black/5 scale-[1.02]'
+                                        : 'hover:bg-gray-100 dark:hover:bg-zinc-800 hover:scale-[1.01] text-gray-600 dark:text-gray-400'
+                                }`}
                             >
-                                <div className={`mt-1 w-2.5 h-2.5 rounded-full mr-4 flex-shrink-0 ${currentStep === index ? 'bg-indigo-600' : 'bg-gray-300'}`} />
+                                <div className={`mt-1 w-2.5 h-2.5 rounded-full mr-4 flex-shrink-0 ${currentStep === index ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-gray-600'}`} />
                                 <div>
-                                    <span className={`block text-base font-bold ${currentStep === index ? 'text-gray-900' : 'text-gray-500'}`}>
+                                    <span className={`block text-base font-bold ${currentStep === index ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}`}>
                                         {step.title}
                                     </span>
                                     {currentStep === index && (
-                                        <span className="block text-xs text-gray-500 mt-1 leading-relaxed">
+                                        <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
                                             {step.description}
                                         </span>
                                     )}
@@ -189,7 +202,7 @@ export function PortfolioManager({ onFinish, isModal = false }: PortfolioManager
                                 <button
                                     onClick={handleSave}
                                     disabled={isSaving}
-                                    className="px-6 py-2.5 bg-black text-white rounded-lg font-medium text-sm shadow-lg shadow-gray-200 hover:bg-gray-800 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2"
+                                    className="px-6 py-2.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg font-medium text-sm hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors flex items-center gap-2"
                                 >
                                     {isSaving ? (
                                         <>
@@ -244,6 +257,12 @@ export function PortfolioManager({ onFinish, isModal = false }: PortfolioManager
                             {currentStepConfig.id === 'hero' && (
                                 <HeroEditor data={editedData.hero} onChange={(d) => handleUpdate('hero', d)} />
                             )}
+                            {currentStepConfig.id === 'about' && (
+                                <AboutEditor data={editedData.about} onChange={(d) => handleUpdate('about', d)} />
+                            )}
+                            {currentStepConfig.id === 'socials' && (
+                                <SocialsEditor data={editedData.socials} onChange={(d) => handleUpdate('socials', d)} />
+                            )}
                             {currentStepConfig.id === 'tech_stack' && (
                                 <TechStackEditor data={editedData.tech_stack} onChange={(d) => handleUpdate('tech_stack', d)} />
                             )}
@@ -252,9 +271,6 @@ export function PortfolioManager({ onFinish, isModal = false }: PortfolioManager
                             )}
                             {currentStepConfig.id === 'projects' && (
                                 <ProjectsEditor data={editedData.projects} onChange={(d) => handleUpdate('projects', d)} />
-                            )}
-                            {currentStepConfig.id === 'about' && (
-                                <AboutEditor data={editedData.about} onChange={(d) => handleUpdate('about', d)} />
                             )}
                         </div>
                     ) : null}

@@ -2,6 +2,7 @@ export interface HeroSection {
     full_name: string;
     headline: string;
     short_bio: string;
+    profile_image?: string;
 }
 
 export interface SocialLinks {
@@ -10,6 +11,7 @@ export interface SocialLinks {
     twitter?: string;
     portfolio?: string;
     email?: string;
+    [key: string]: string | undefined; // Allow any social platform from registry
 }
 
 export interface ExperienceItem {
