@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { TechBadge } from "./tech-badge";
 import { apiRequest } from "../../../../../lib/api";
 
-const BASE_API_URL = 'https://qgwkmvmz-8000.inc1.devtunnels.ms'; // Should ideally be shared or proxied
+const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface SmartTechBadgeProps {
   codeName: string;
@@ -13,7 +13,7 @@ interface SmartTechBadgeProps {
 interface TechApiResponse {
   display_name: string;
   code_name: string;
-  icon_path: string;
+  icon_path: string | null;
   doc_url: string;
   color_variant: 'colored' | 'black' | 'white';
 }
@@ -68,18 +68,21 @@ export function SmartTechBadge({ codeName }: SmartTechBadgeProps) {
     return <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-zinc-800 rounded text-gray-400 text-xs animate-pulse">loading...</span>;
   }
 
-  if (notFound) {
+  if (notFound || (data && !data.icon_path)) {
+    const isMissingIcon = !!(data && !data.icon_path);
+    const displayName = data?.display_name || codeName;
+
     return (
       <>
         <button
           onClick={handleAddCustomTech}
           className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded text-amber-700 dark:text-amber-400 text-xs font-medium hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors cursor-pointer"
-          title="Tech not found - Click to add custom badge"
+          title={isMissingIcon ? "Icon not found - Click to add custom badge" : "Tech not found - Click to add custom badge"}
         >
           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          {codeName}
+          {displayName}
         </button>
 
         {/* Modal */}
@@ -95,10 +98,12 @@ export function SmartTechBadge({ codeName }: SmartTechBadgeProps) {
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                    Tech Badge Not Found
+                    {isMissingIcon ? "Tech Badge Icon Missing" : "Tech Badge Not Found"}
                   </h3>
                   <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-                    "{codeName}" is not in our database
+                    {isMissingIcon 
+                      ? `The icon for "${displayName}" is missing.` 
+                      : `"${displayName}" is not in our database`}
                   </p>
                 </div>
                 <button
@@ -114,7 +119,9 @@ export function SmartTechBadge({ codeName }: SmartTechBadgeProps) {
               <div className="space-y-4">
                 <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-lg">
                   <p className="text-sm text-amber-800 dark:text-amber-400">
-                    This technology badge is not available in our database. You can add a custom badge through the Portfolio Editor.
+                    {isMissingIcon
+                      ? "You can add a custom badge for this technology through the Portfolio Editor."
+                      : "This technology badge is not available in our database. You can add a custom badge through the Portfolio Editor."}
                   </p>
                 </div>
 
@@ -124,9 +131,9 @@ export function SmartTechBadge({ codeName }: SmartTechBadgeProps) {
                   </p>
                   <ol className="text-sm text-zinc-600 dark:text-zinc-400 space-y-1 list-decimal list-inside">
                     <li>Go to Portfolio Editor</li>
-                    <li>Navigate to the About section</li>
+                    <li>Navigate to the Bio & About section</li>
                     <li>Click "Add Custom Tech Badge"</li>
-                    <li>Fill in the details for "{codeName}"</li>
+                    <li>Fill in the details for "{displayName}"</li>
                   </ol>
                 </div>
 
@@ -158,7 +165,8 @@ export function SmartTechBadge({ codeName }: SmartTechBadgeProps) {
   }
 
   // Construct full image URL if relative or pointing to localhost (fix for dev tunnels)
-  let imageUrl = data.icon_path;
+  // At this point we know data exists and icon_path is valid
+  let imageUrl = data!.icon_path!;
   if (imageUrl.startsWith('http://localhost') || imageUrl.startsWith('http://127.0.0.1')) {
       // Strip domain to make it relative to the API base we want to use
       try {
@@ -166,18 +174,18 @@ export function SmartTechBadge({ codeName }: SmartTechBadgeProps) {
           imageUrl = `${BASE_API_URL}${urlObj.pathname}`;
       } catch (e) {
           // Fallback if URL parsing fails
-          imageUrl = `${BASE_API_URL}${data.icon_path}`; 
+          imageUrl = `${BASE_API_URL}${data!.icon_path!}`; 
       }
   } else if (!imageUrl.startsWith('http')) {
-      imageUrl = `${BASE_API_URL}${data.icon_path}`;
+      imageUrl = `${BASE_API_URL}${data!.icon_path!}`;
   }
 
   return (
     <TechBadge 
-      name={data.display_name}
-      href={data.doc_url}
+      name={data!.display_name}
+      href={data!.doc_url}
       imageSrc={imageUrl}
-      variant={data.color_variant}
+      variant={data!.color_variant}
     />
   );
 }

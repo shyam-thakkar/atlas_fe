@@ -59,7 +59,7 @@ export function ResumePreview({ data }: ResumePreviewProps) {
                             <span className="text-sm font-medium text-gray-900 truncate" title={data.original_filename}>{data.original_filename}</span>
                         </div>
                         <a
-                            href={data.file.startsWith('http') ? data.file : `http://localhost:8000${data.file.startsWith('/') ? '' : '/'}${data.file}`}
+                            href={data.file.startsWith('http') ? data.file : `${process.env.NEXT_PUBLIC_API_URL}${data.file.startsWith('/') ? '' : '/'}${data.file}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"

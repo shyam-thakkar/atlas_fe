@@ -1,5 +1,6 @@
 export interface TechBadgeData {
     name: string;
+    code_name?: string; // Added code_name to support using slug/code instead of display name
     href: string;
     imageSrc: string;
     variant?: 'colored' | 'black' | 'white';

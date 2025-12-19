@@ -26,7 +26,7 @@ const STYLES = {
         container: "relative bg-white dark:bg-zinc-900 rounded-xl border-2 border-zinc-200 dark:border-zinc-800 overflow-hidden hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300 hover:shadow-lg cursor-pointer flex flex-col h-full",
         image: "relative h-48 w-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden",
         content: "p-4 flex flex-col flex-grow h-full",
-        title: "text-xl font-bold text-black dark:text-white mb-2 h-14 line-clamp-2",
+        title: "text-xl font-bold text-black dark:text-white mb-2 h-12 line-clamp-2",
         description: "text-sm text-zinc-600 dark:text-zinc-400 mb-4 h-[60px] line-clamp-3",
         link: "flex items-center gap-1 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:text-black dark:hover:text-white transition-colors",
     },

@@ -16,19 +16,26 @@ export interface SocialLinks {
 
 export interface ExperienceItem {
     role: string;
-    company: string;
+    company_name: string;
     start_date: string;
     end_date: string | null;
-    summary: string;
-    technologies?: string[]; 
+    is_current: boolean;
+    description: string;
+    technologies?: string[];
+    logo_url?: string | null;
 }
 
 export interface ProjectItem {
-    name: string;
+    title: string;
     description: string;
     technologies: string[];
-    github_link?: string;
-    live_link?: string;
+    repo_url?: string;
+    live_url?: string;
+    key_features?: string[];
+    technical_challenges?: string[];
+    year?: string;
+    project_type?: string;
+    thumbnail_url?: string | null;
 }
 
 export interface AboutSection {
@@ -45,15 +52,15 @@ export interface StructuredPortfolio {
     about: AboutSection;
 }
 
-export type PipelineStatusEnum = 
+export type PipelineStatusEnum =
     | 'idle'
-    | 'uploaded' 
-    | 'raw_extracting' 
-    | 'raw_extracted' 
-    | 'structure_extracting' 
-    | 'structure_extracted' 
-    | 'review_required' 
-    | 'completed' 
+    | 'uploaded'
+    | 'raw_extracting'
+    | 'raw_extracted'
+    | 'structure_extracting'
+    | 'structure_extracted'
+    | 'review_required'
+    | 'completed'
     | 'failed';
 
 export interface PipelineStatus {

@@ -223,7 +223,7 @@ export function SocialsEditor({ data, onChange }: SocialsEditorProps) {
                                 {/* Social Icon */}
                                 <div className="w-12 h-12 flex-shrink-0 bg-zinc-100 dark:bg-zinc-800 rounded-lg flex items-center justify-center p-2.5">
                                     {(() => {
-                                        const BASE_API_URL = 'https://qgwkmvmz-8000.inc1.devtunnels.ms';
+                                        const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL;
                                         let imageUrl = selectedSocial.icon_path;
                                         if (imageUrl && !imageUrl.startsWith('http')) {
                                             imageUrl = `${BASE_API_URL}${imageUrl}`;
@@ -233,8 +233,8 @@ export function SocialsEditor({ data, onChange }: SocialsEditorProps) {
                                         const shouldInvertInLight = selectedSocial.color_variant === 'white';
 
                                         return imageUrl ? (
-                                            <img 
-                                                src={imageUrl} 
+                                            <img
+                                                src={imageUrl}
                                                 alt={selectedSocial.display_name}
                                                 className={`w-full h-full object-contain ${shouldInvertInDark ? 'dark:invert' : ''} ${shouldInvertInLight ? 'invert dark:invert-0' : ''}`}
                                             />
@@ -245,7 +245,7 @@ export function SocialsEditor({ data, onChange }: SocialsEditorProps) {
                                         );
                                     })()}
                                 </div>
-                                
+
                                 {/* Title */}
                                 <div className="flex-1">
                                     <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
@@ -257,7 +257,7 @@ export function SocialsEditor({ data, onChange }: SocialsEditorProps) {
                                 </div>
                             </div>
                         </div>
-                        
+
                         {/* Form */}
                         <div className="p-6 space-y-4">
                             <div>
@@ -271,14 +271,13 @@ export function SocialsEditor({ data, onChange }: SocialsEditorProps) {
                                         setUrlInput(e.target.value);
                                         setUrlError(''); // Clear error on input change
                                     }}
-                                    placeholder={selectedSocial.code_name.toLowerCase() === 'email' 
-                                        ? 'your.email@example.com' 
+                                    placeholder={selectedSocial.code_name.toLowerCase() === 'email'
+                                        ? 'your.email@example.com'
                                         : `https://${selectedSocial.code_name}.com/username`}
-                                    className={`w-full px-3 py-2.5 bg-white dark:bg-zinc-800 border rounded-lg text-sm outline-none focus:ring-2 transition-all text-zinc-900 dark:text-zinc-100 ${
-                                        urlError 
-                                            ? 'border-red-300 dark:border-red-700 focus:ring-red-500' 
+                                    className={`w-full px-3 py-2.5 bg-white dark:bg-zinc-800 border rounded-lg text-sm outline-none focus:ring-2 transition-all text-zinc-900 dark:text-zinc-100 ${urlError
+                                            ? 'border-red-300 dark:border-red-700 focus:ring-red-500'
                                             : 'border-zinc-200 dark:border-zinc-700 focus:ring-zinc-900 dark:focus:ring-zinc-100'
-                                    }`}
+                                        }`}
                                     autoFocus
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter' && urlInput) {
@@ -338,7 +337,7 @@ function SocialItem({ item, onRemove, onUpdateUrl }: SocialItemProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [editUrl, setEditUrl] = useState(item.url);
 
-    const BASE_API_URL = 'https://qgwkmvmz-8000.inc1.devtunnels.ms';
+    const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL;
 
     let imageUrl = item.icon_path;
     if (imageUrl && !imageUrl.startsWith('http')) {

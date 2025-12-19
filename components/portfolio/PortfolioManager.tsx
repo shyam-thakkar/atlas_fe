@@ -219,7 +219,7 @@ export function PortfolioManager({ onFinish, isModal = false, onDataChange, defa
                 </div>
 
                 {/* Editor Content Area */}
-                <div className={`flex-1 overflow-y-auto p-6 bg-white ${!isEditing ? 'pointer-events-none opacity-80 grayscale-[0.3]' : ''}`}>
+                <div className={`flex-1 overflow-y-auto p-6 bg-white ${!isEditing ? 'opacity-80 grayscale-[0.3]' : ''}`}>
                     {isLoading ? (
                         <div className="h-full flex items-center justify-center">
                             <div className="flex flex-col items-center gap-3">
@@ -253,7 +253,7 @@ export function PortfolioManager({ onFinish, isModal = false, onDataChange, defa
                             )}
                         </div>
                     ) : editedData ? (
-                        <div className="w-full animate-in fade-in slide-in-from-right-4 duration-300 key={currentStep}">
+                        <div className={`w-full animate-in fade-in slide-in-from-right-4 duration-300 ${!isEditing ? 'pointer-events-none' : ''}`} key={currentStep}>
                             {currentStepConfig.id === 'hero' && (
                                 <HeroEditor data={editedData.hero} onChange={(d) => handleUpdate('hero', d)} />
                             )}

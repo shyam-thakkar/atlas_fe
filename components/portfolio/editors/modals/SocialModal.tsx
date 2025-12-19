@@ -119,7 +119,7 @@ export function SocialModal({ isOpen, onClose, onSelect }: SocialModalProps) {
 
     if (!isOpen || !mounted) return null;
 
-    const BASE_API_URL = 'https://qgwkmvmz-8000.inc1.devtunnels.ms';
+    const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL;
 
     return createPortal(
         <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>

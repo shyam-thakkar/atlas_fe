@@ -3,13 +3,11 @@
 import { useState, useCallback, useMemo } from "react";
 import { ThemeToggle } from "./src/components/theme-toggle";
 import { ModelCard } from "./src/components/model-card";
-import { StatsCard } from "./src/components/stats-card";
 import { ProjectCard } from "./src/components/project-card";
 import { ProjectDetail, ProjectDetailData } from "./src/components/project-detail";
 import { Experience } from "./src/components/experience";
 import { TypingAnimation } from "./src/components/typing-animation";
 import { ContactSection } from "./src/components/contact-section";
-import { PROJECT_DETAILS } from "./src/constants/project-data";
 import { EDUCATION_DATA } from "./src/constants/education-data";
 import { StructuredPortfolio } from "../../../types/portfolio";
 import { SmartTechBadge } from "./src/components/smart-tech-badge";
@@ -22,7 +20,7 @@ interface PortfolioDesign1Props {
 
 export function PortfolioDesign1({ data }: PortfolioDesign1Props) {
   const [view, setView] = useState<'main' | 'model-card'>('main');
-  const [selectedProject, setSelectedProject] = useState<ProjectDetailData | null>(null);
+  const [selectedProjectIndex, setSelectedProjectIndex] = useState<number | null>(null);
   const [isDark, setIsDark] = useState(false);
 
   const handleThemeToggle = () => {
@@ -35,25 +33,40 @@ export function PortfolioDesign1({ data }: PortfolioDesign1Props) {
     return {
       name: data.hero.full_name || "Your Name",
       title: data.hero.headline || "Your Title",
-      greeting: "Hey! I'm " + (data.hero.full_name?.split(' ')[0] || "User"),
+      greeting: "Hey! I'm " + (data.hero.full_name || "User"),
       typingText: data.hero.headline || "Developer",
       profileImage: data.hero.profile_image || "/profile.png",
       description: data.about.long_bio || "No bio available.",
     };
   }, [data]);
 
-  const projectDetails = useMemo(() => PROJECT_DETAILS, []); // TODO: Map from data.projects
+  // Compute selected project detail data dynamically from current data
+  const selectedProject = useMemo(() => {
+    if (selectedProjectIndex === null || !data?.projects[selectedProjectIndex]) return null;
 
-  const openProjectDetail = useCallback((projectKey: string) => {
-    const detail = projectDetails[projectKey];
-    if (detail) {
-      setSelectedProject(detail);
-    }
-  }, [projectDetails]);
+    const proj = data.projects[selectedProjectIndex];
+    return {
+      title: proj.title,
+      description: proj.description,
+      longDescription: proj.description,
+      image: proj.thumbnail_url || '/project-placeholder.png',
+      tags: proj.technologies || [],
+      techStack: [], // TODO: map technologies to TechItem[]
+      liveUrl: proj.live_url,
+      githubUrl: proj.repo_url,
+      features: proj.key_features || [],
+      challenges: proj.technical_challenges || [],
+      date: proj.year,
+      team: proj.project_type,
+    } as ProjectDetailData;
+  }, [selectedProjectIndex, data?.projects]);
+
+  const openProjectDetail = useCallback((index: number) => {
+    setSelectedProjectIndex(index);
+  }, []);
 
   const handleViewChange = useCallback(() => setView('main'), []);
-  const handleStatsClick = useCallback(() => setView('model-card'), []);
-  const handleCloseProject = useCallback(() => setSelectedProject(null), []);
+  const handleCloseProject = useCallback(() => setSelectedProjectIndex(null), []);
 
   if (!data || !personalInfo) return <div className="p-10 text-center">Loading or No Data...</div>;
 
@@ -88,9 +101,9 @@ export function PortfolioDesign1({ data }: PortfolioDesign1Props) {
                 <div className="w-12 h-12 rounded-lg overflow-hidden bg-transparent relative">
                   {/* Use profile image if available */}
                   {personalInfo.profileImage && personalInfo.profileImage !== "/profile.png" ? (
-                    <img 
-                      src={personalInfo.profileImage} 
-                      alt={personalInfo.name} 
+                    <img
+                      src={personalInfo.profileImage}
+                      alt={personalInfo.name}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -120,43 +133,46 @@ export function PortfolioDesign1({ data }: PortfolioDesign1Props) {
           {view === 'main' ? (
             <>
               {/* Hero Section */}
-              <section className="py-8">
-                <div className="flex gap-8 items-center ">
+              <section className="py-12">
+                <div className="flex gap-6 items-center mb-10">
                   {/* Left: Profile Photo */}
                   <div className="flex-shrink-0">
-                    <div className="w-32 h-32 rounded-full overflow-hidden bg-transparent relative">
+                    <div className="w-40 h-40 rounded-full overflow-hidden bg-transparent relative border-4 border-zinc-200 dark:border-zinc-800">
                       {personalInfo.profileImage && personalInfo.profileImage !== "/profile.png" ? (
-                        <img 
-                          src={personalInfo.profileImage} 
-                          alt={personalInfo.name} 
+                        <img
+                          src={personalInfo.profileImage}
+                          alt={personalInfo.name}
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="absolute inset-0 flex items-center justify-center bg-indigo-100 text-indigo-500 font-bold text-4xl border-2 border-zinc-300 dark:border-zinc-700">
-                           {personalInfo.name.charAt(0)}
+                        <div className="absolute inset-0 flex items-center justify-center bg-indigo-100 text-indigo-500 font-bold text-5xl">
+                          {personalInfo.name.charAt(0)}
                         </div>
                       )}
                     </div>
                   </div>
-                  <StatsCard onClick={handleStatsClick} />
-                </div>
-                <div className="mt-8">
-                  {/* Greeting - Larger and Brighter */}
-                  <div className="flex flex-wrap items-baseline gap-2 mb-4">
-                    <p className="text-3xl font-bold text-black dark:text-white transition-colors duration-300">
+
+                  {/* Right: Greeting and Typing Animation */}
+                  <div className="flex-1">
+                    {/* Greeting */}
+                    <h1 className="text-2xl md:text-3xl font-bold text-black dark:text-white transition-colors duration-300 mb-3 whitespace-nowrap">
                       {personalInfo.greeting}
-                    </p>
-                    <p className="text-3xl font text-zinc-400 dark:text-zinc-400 font-heading">
-                      - <TypingAnimation text={personalInfo.typingText} speed={100} delay={500} />
+                    </h1>
+                    {/* Typing Animation */}
+                    <p className="text-xl md:text-2xl text-zinc-500 dark:text-zinc-400 font-light">
+                      <TypingAnimation text={personalInfo.typingText} speed={100} delay={500} />
                     </p>
                   </div>
+                </div>
+
+                <div>
                   {/* Description with Badges */}
-                  <div className="text-lg leading-loose text-zinc-600 dark:text-zinc-400 mb-6 transition-colors duration-300">
+                  <div className="text-lg leading-relaxed text-zinc-600 dark:text-zinc-400 mb-8 transition-colors duration-300">
                     {renderBioWithBadges(personalInfo.description)}
                   </div>
 
                   {/* Social Media Links */}
-                  <div className="mt-6 flex flex-wrap items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-3">
                     {data.socials && Object.entries(data.socials).map(([platform, url]) => {
                       if (!url || typeof url !== 'string') return null;
 
@@ -196,8 +212,7 @@ export function PortfolioDesign1({ data }: PortfolioDesign1Props) {
               {/* Projects Section */}
               <section className="py-8">
                 {/* Experience Section */}
-                <Experience />
-                {/* TODO: Pass data.experience to Experience component */}
+                <Experience data={data.experience} />
 
                 <h2 className="text-3xl font-bold text-black dark:text-white mb-6 mt-12 transition-colors duration-300">
                   Projects
@@ -205,35 +220,21 @@ export function PortfolioDesign1({ data }: PortfolioDesign1Props) {
 
                 {/* All Projects - Card Style Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Demo Projects from Constants */}
-                  <ProjectCard
-                    project={{
-                      title: projectDetails["karate-kata"].title,
-                      description: projectDetails["karate-kata"].description,
-                      image: projectDetails["karate-kata"].image,
-                      tags: projectDetails["karate-kata"].tags,
-                      techStack: projectDetails["karate-kata"].techStack,
-                      liveUrl: projectDetails["karate-kata"].liveUrl,
-                      githubUrl: projectDetails["karate-kata"].githubUrl,
-                      variant: "card"
-                    }}
-                    onClick={() => openProjectDetail("karate-kata")}
-                  />
                   {/* Real Data Projects */}
                   {data.projects.map((proj, i) => (
                     <ProjectCard
                       key={i}
                       project={{
-                        title: proj.name,
+                        title: proj.title,
                         description: proj.description,
-                        image: "/project-placeholder.png",
+                        image: proj.thumbnail_url || undefined,
                         tags: proj.technologies || [],
                         techStack: [], // TODO: map technologies to icons
-                        liveUrl: "#",
-                        githubUrl: "#",
+                        liveUrl: proj.live_url || undefined,
+                        githubUrl: proj.repo_url || undefined,
                         variant: "card"
                       }}
-                      onClick={() => { }} // TODO: Open detail
+                      onClick={() => openProjectDetail(i)}
                     />
                   ))}
                 </div>

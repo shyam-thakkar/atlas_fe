@@ -20,26 +20,39 @@ export function DateSelector({ label, value, onChange, isEndDate }: DateSelector
     let selectedYear = '';
 
     if (value && value !== 'Present') {
-        const parts = value.split(' ');
-        if (parts.length >= 2) {
-            if (MONTHS.includes(parts[0])) {
-                selectedMonth = parts[0];
-                selectedYear = parts[1];
-            } else if (MONTHS.some(m => m.startsWith(parts[0]))) {
-                const match = MONTHS.find(m => m.startsWith(parts[0]));
-                if (match) selectedMonth = match;
-                selectedYear = parts[1];
+        // Try parsing ISO YYYY-MM-DD
+        const isoMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        
+        if (isoMatch) {
+            selectedYear = isoMatch[1];
+            const mIndex = parseInt(isoMatch[2], 10) - 1;
+            if (MONTHS[mIndex]) selectedMonth = MONTHS[mIndex];
+        } else {
+            // Fallback to "Month Year" format
+            const parts = value.split(' ');
+            if (parts.length >= 2) {
+                if (MONTHS.includes(parts[0])) {
+                    selectedMonth = parts[0];
+                    selectedYear = parts[1];
+                } else if (MONTHS.some(m => m.startsWith(parts[0]))) {
+                    const match = MONTHS.find(m => m.startsWith(parts[0]));
+                    if (match) selectedMonth = match;
+                    selectedYear = parts[1];
+                }
+            } else if (parts.length === 1 && YEARS.includes(parts[0])) {
+                selectedYear = parts[0];
             }
-        } else if (parts.length === 1 && YEARS.includes(parts[0])) {
-            selectedYear = parts[0];
         }
     }
 
     const updateDate = (m: string, y: string) => {
-        if (m && y) onChange(`${m} ${y}`);
-        else if (y && !m) onChange(y);
-        else if (m && !y) { }
-        else if (m && y) onChange(`${m} ${y}`);
+        if (m && y) {
+            const mIndex = MONTHS.indexOf(m);
+            if (mIndex !== -1) {
+                const monthStr = (mIndex + 1).toString().padStart(2, '0');
+                onChange(`${y}-${monthStr}-01`);
+            }
+        }
     };
 
     const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

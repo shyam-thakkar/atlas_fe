@@ -63,7 +63,7 @@ export function DashboardSidebar({ collapsed = false, onToggle }: DashboardSideb
   return (
     <div className="flex flex-col h-full bg-zinc-50 dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800 transition-colors">
       {/* Header */}
-      <div className={`h-14 flex items-center ${collapsed ? 'justify-center px-2' : 'justify-between px-4'} border-b border-zinc-100 dark:border-zinc-800/50`}>
+      <div className={`h-12 flex items-center ${collapsed ? 'justify-center px-2' : 'justify-between px-4'} border-b border-zinc-100 dark:border-zinc-800/50`}>
         <div className="flex items-center gap-3">
           {onToggle && (
             <button

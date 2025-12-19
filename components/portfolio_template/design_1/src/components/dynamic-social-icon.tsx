@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiRequest } from "../../../../../lib/api";
 
-const BASE_API_URL = 'https://qgwkmvmz-8000.inc1.devtunnels.ms';
+const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface DynamicSocialIconProps {
     platform: string; // e.g., "github", "linkedin"
@@ -14,7 +14,7 @@ interface DynamicSocialIconProps {
 interface SocialApiResponse {
     display_name: string;
     code_name: string;
-    icon_path: string;
+    icon_path: string | null;
     color_variant: 'colored' | 'black' | 'white';
 }
 
@@ -55,7 +55,7 @@ export function DynamicSocialIcon({ platform, url, className = "" }: DynamicSoci
         );
     }
 
-    if (!data) {
+    if (!data || !data.icon_path) {
         // Fallback: show generic icon
         return (
             <a

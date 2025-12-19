@@ -23,7 +23,7 @@ export function AboutEditor({ data, onChange }: AboutEditorProps) {
         const text = about.long_bio || '';
         const before = text.substring(0, start);
         const after = text.substring(end);
-        
+
         const newText = before + code + after;
         onChange({ ...about, long_bio: newText });
 
@@ -39,10 +39,10 @@ export function AboutEditor({ data, onChange }: AboutEditorProps) {
         <div className="space-y-6">
             <div>
                 <label className="text-sm font-semibold text-gray-700 block mb-2">Detailed Bio</label>
-                
+
                 {/* Toolbar */}
                 <div className="mb-3 flex flex-wrap items-center gap-2 p-2 bg-gray-50 border border-gray-200 rounded-lg">
-                    <button 
+                    <button
                         type="button"
                         onClick={() => setIsModalOpen(true)}
                         className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-xs font-semibold rounded hover:bg-zinc-800 transition-colors shadow-sm"
@@ -71,7 +71,7 @@ export function AboutEditor({ data, onChange }: AboutEditorProps) {
                 </p>
             </div>
 
-            <TechBadgeModal 
+            <TechBadgeModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSelect={(badge) => {
@@ -79,7 +79,8 @@ export function AboutEditor({ data, onChange }: AboutEditorProps) {
                     // If it's a new custom badge, we might want to store it somewhere globally or just rely on the name lookup if we had a dynamic backend.
                     // For now, prompt implies we just insert the {{code}} and the frontend renderer handles it (or falls back).
                     // In a real app, 'onSelect' might check if it needs to be POSTed to backend first.
-                    insertCode(`{{${badge.name}}}`);
+                    const code = badge.code_name || badge.name.toLowerCase().replace(/\s+/g, '');
+                    insertCode(`{{${code}}}`);
                 }}
             />
         </div>

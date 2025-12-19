@@ -104,7 +104,7 @@ export function ResumeStatus({
                         <p className="text-xs text-zinc-400">{new Date(resumeData.uploaded_at).toLocaleDateString()}</p>
                     </div>
                     <a
-                        href={resumeData.file.startsWith('http') ? resumeData.file : `http://localhost:8000${resumeData.file.startsWith('/') ? '' : '/'}${resumeData.file}`}
+                        href={resumeData.file.startsWith('http') ? resumeData.file : `${process.env.NEXT_PUBLIC_API_URL}${resumeData.file.startsWith('/') ? '' : '/'}${resumeData.file}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="p-1.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"

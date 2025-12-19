@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Search, Plus, X, Globe, Code } from "lucide-react";
 import { DESCRIPTION_TECH_BADGES, TechBadgeData } from "@/components/portfolio_template/design_1/src/constants/tech-badges";
@@ -15,6 +15,7 @@ interface TechBadgeModalProps {
 
 export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProps) {
     const [mounted, setMounted] = useState(false);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     // ... State declarations
     const [searchQuery, setSearchQuery] = useState("");
@@ -36,12 +37,21 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
     const [customVariant, setCustomVariant] = useState<"colored" | "black" | "white">("colored");
 
     useEffect(() => {
-        setMounted(true);
-        return () => setMounted(false);
-    }, []);
+        if (isOpen) {
+            setMounted(true);
+            resetForm();
+            // Fetch initial data immediately when opening
+            fetchTechs(true);
+        } else {
+            // Optional: delayed unmount for animation
+            // setTimeout(() => setMounted(false), 200); 
+            // For now simple unmount
+            setMounted(false);
+        }
+    }, [isOpen]);
 
     // Unified Fetch for List & Search
-    const fetchTechs = async (reset: boolean = false) => {
+    const fetchTechs = useCallback(async (reset: boolean = false) => {
         if (reset) {
             setPage(1);
             setSearchResults([]);
@@ -55,18 +65,12 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
         try {
             const baseUrl = `/api/profile/tech/list/`;
             const params = new URLSearchParams({
-                page_size: '20',
+                page_size: '20', // Increased to ensure scrollbar appears on larger screens
             });
 
             if (reset) {
                 params.set('page', '1');
             } else if (nextPageUrl) {
-                // If we have a next URL from backend, parsing page might be safer 
-                // but usually the backend returns full absolute URL. 
-                // However, request utility handles base. 
-                // Let's assume we rely on 'page' state increment if we construct URL ourselves,
-                // or use 'next' URL if available. 
-                // Strategy: Use 'page' state for simplicity with our API helper.
                 params.set('page', (page + 1).toString());
             }
 
@@ -85,15 +89,16 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
                 newResults = response.results;
                 next = response.next;
             } else if (Array.isArray(response)) {
-                // Fallback for non-paginated arrays (shouldn't happen with new endpoint but good safety)
+                // Fallback for non-paginated arrays
                 newResults = response;
                 next = null;
             }
 
             const mappedResults: TechBadgeData[] = newResults.map((item: any) => ({
                 name: item.display_name || item.name || "Unknown",
+                code_name: item.code_name || item.name?.toLowerCase().replace(/\s+/g, '-') || "unknown",
                 href: item.doc_url || item.href || "#",
-                imageSrc: item.icon_source_url || item.icon_path || item.imageSrc || "",
+                imageSrc: item.icon_path || item.imageSrc || "",
                 variant: item.color_variant || item.variant || "colored"
             }));
 
@@ -115,7 +120,7 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
             setIsLoading(false);
             setIsLoadingMore(false);
         }
-    };
+    }, [page, nextPageUrl, searchQuery]);
 
     // Refetch when search query changes
     useEffect(() => {
@@ -124,6 +129,21 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
         }, 300);
         return () => clearTimeout(timeoutId);
     }, [searchQuery]);
+
+    // Check if we need to load more data to fill the screen (Auto-fill)
+    useEffect(() => {
+        if (!isLoading && !isLoadingMore && hasMore && scrollContainerRef.current) {
+            const { scrollHeight, clientHeight } = scrollContainerRef.current;
+            // If content is smaller than container effectively, trigger load
+            if (scrollHeight <= clientHeight + 50) {
+                // Need to be careful not to loop. state update in fetchTechs handles it?
+                // The hasMore check protects end. 
+                // The isLoading check protects parallel.
+                // It should be fine.
+                fetchTechs(false);
+            }
+        }
+    }, [searchResults, hasMore, isLoading, isLoadingMore, fetchTechs]);
 
     // Infinite Scroll Handler
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -160,6 +180,7 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
             // Map response back to TechBadgeData format
             const mappedBadge: TechBadgeData = {
                 name: newBadge.display_name || customName,
+                code_name: newBadge.code_name || customCode,
                 href: newBadge.doc_url || customUrl || '#',
                 imageSrc: newBadge.icon_source_url || newBadge.icon_path || customIcon || '',
                 variant: newBadge.color_variant || customVariant
@@ -212,11 +233,16 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
                                     <input
                                         type="text"
                                         placeholder="Search technologies (e.g. Python, React)..."
-                                        className="w-full pl-9 pr-4 py-2 bg-white border border-zinc-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-black transition-all text-zinc-900"
+                                        className="w-full pl-9 pr-10 py-2 bg-white border border-zinc-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-black transition-all text-zinc-900"
                                         value={searchQuery}
                                         onChange={e => setSearchQuery(e.target.value)}
                                         autoFocus
                                     />
+                                    {isLoading && (
+                                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                            <div className="w-4 h-4 border-2 border-zinc-300 border-t-zinc-600 rounded-full animate-spin"></div>
+                                        </div>
+                                    )}
                                 </div>
                                 <button
                                     onClick={() => setIsCustomMode(true)}
@@ -228,10 +254,10 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
                             </div>
                         </div>
 
-                        <div className="overflow-y-auto p-4 min-h-[300px]" onScroll={handleScroll}>
+                        <div ref={scrollContainerRef} className="overflow-y-auto p-4 h-[350px]" onScroll={handleScroll}>
                             {/* RESULTS LIST */}
                             {searchResults.length > 0 ? (
-                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                     {searchResults.map((badge, idx) => (
                                         <button
                                             key={`${badge.name}-${idx}`}
@@ -243,7 +269,13 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
                                         >
                                             <div className="w-8 h-8 flex items-center justify-center bg-zinc-100 rounded p-1 group-hover:scale-110 transition-transform">
                                                 {badge.imageSrc ? (
-                                                    <img src={badge.imageSrc} alt="" className="w-full h-full object-contain" />
+                                                    <img
+                                                        src={badge.imageSrc}
+                                                        alt=""
+                                                        className={`w-full h-full object-contain ${badge.variant === 'black' ? 'dark:invert' :
+                                                            badge.variant === 'white' ? ' invert dark:invert-0' : ''
+                                                            }`}
+                                                    />
                                                 ) : (
                                                     <Code className="w-4 h-4 text-zinc-400" />
                                                 )}
@@ -258,6 +290,11 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
                                             Loading more...
                                         </div>
                                     )}
+                                </div>
+                            ) : isLoading ? (
+                                <div className="flex flex-col items-center justify-center py-20">
+                                    <div className="w-8 h-8 border-4 border-zinc-200 border-t-black rounded-full animate-spin mb-4"></div>
+                                    <p className="text-zinc-500 text-sm">Loading technologies...</p>
                                 </div>
                             ) : (
                                 /* EMPTY STATE */
@@ -342,7 +379,14 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
                                         />
                                         <div className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center">
                                             {customIcon ? (
-                                                <img src={customIcon} alt="" className="w-4 h-4 object-contain" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                                                <img
+                                                    src={customIcon}
+                                                    alt=""
+                                                    className={`w-4 h-4 object-contain ${customVariant === 'black' ? 'dark:invert' :
+                                                        customVariant === 'white' ? 'invert dark:invert-0' : ''
+                                                        }`}
+                                                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                                                />
                                             ) : (
                                                 <Globe className="w-3.5 h-3.5 text-zinc-400" />
                                             )}

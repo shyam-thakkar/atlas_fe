@@ -14,11 +14,17 @@ export function TechStackEditor({ data, onChange }: TechStackEditorProps) {
 
     const handleAddTech = async (badge: TechBadgeData) => {
         try {
-            // Search for the tech in the API to get its code_name
-            const response = await apiRequest<any>(`/api/profile/tech/search/?q=${encodeURIComponent(badge.name)}`);
-            const codeName = response?.code_name || badge.name.toLowerCase().replace(/\s+/g, '-');
+            // Use code_name from badge if available, otherwise search API or fallback
+            // Type-checking: Ensure codeName is string, even if badge.code_name is undefined
+            let codeName = badge.code_name;
 
-            if (!stack.includes(codeName)) {
+            if (!codeName) {
+                const response = await apiRequest<any>(`/api/profile/tech/search/?q=${encodeURIComponent(badge.name)}`);
+                codeName = response?.code_name || badge.name.toLowerCase().replace(/\s+/g, '-');
+            }
+
+            // Ensure codeName is string just in case
+            if (codeName && !stack.includes(codeName)) {
                 onChange([...stack, codeName]);
             }
         } catch (error) {
@@ -99,17 +105,25 @@ interface TechStackItemProps {
 function TechStackItem({ codeName, onRemove }: TechStackItemProps) {
     const [techData, setTechData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [notFound, setNotFound] = useState(false);
 
     React.useEffect(() => {
         const fetchTech = async () => {
             try {
-                const response = await fetch(`https://qgwkmvmz-8000.inc1.devtunnels.ms/api/profile/tech/search/?q=${encodeURIComponent(codeName)}`);
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/profile/tech/search/?q=${encodeURIComponent(codeName)}`);
                 if (response.ok) {
                     const data = await response.json();
                     setTechData(data);
+                    setNotFound(false);
+                } else {
+                    if (response.status === 404) {
+                        setNotFound(true);
+                    }
                 }
             } catch (error) {
                 console.error('Failed to fetch tech:', error);
+                // Assume not found if error matches typical 404 behavior or just general failure
+                setNotFound(true);
             } finally {
                 setLoading(false);
             }
@@ -125,10 +139,39 @@ function TechStackItem({ codeName, onRemove }: TechStackItemProps) {
         );
     }
 
+    if (notFound) {
+        return (
+            <div className="relative group bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-lg p-2 hover:border-amber-300 dark:hover:border-amber-700 transition-all">
+                {/* Remove button */}
+                <button
+                    onClick={onRemove}
+                    className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-600 z-10"
+                    title="Remove"
+                >
+                    <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+
+                {/* Tech icon (orange/warning) */}
+                <div className="flex flex-col items-center gap-1">
+                    <div className="w-7 h-7 flex items-center justify-center text-amber-500 dark:text-amber-400">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <span className="text-[10px] font-medium text-amber-700 dark:text-amber-400 text-center leading-tight truncate w-full px-1">
+                        {codeName}
+                    </span>
+                </div>
+            </div>
+        );
+    }
+
     const iconUrl = techData?.icon_path
         ? (techData.icon_path.startsWith('http')
             ? techData.icon_path
-            : `https://qgwkmvmz-8000.inc1.devtunnels.ms${techData.icon_path}`)
+            : `${process.env.NEXT_PUBLIC_API_URL}${techData.icon_path}`)
         : null;
 
     // Determine if we should invert based on color_variant
@@ -140,7 +183,7 @@ function TechStackItem({ codeName, onRemove }: TechStackItemProps) {
             {/* Remove button */}
             <button
                 onClick={onRemove}
-                className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-600"
+                className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-600 z-10"
                 title="Remove"
             >
                 <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

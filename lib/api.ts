@@ -10,7 +10,7 @@ export class APIError extends Error {
     }
 }
 
-const BASE_URL = 'https://qgwkmvmz-8000.inc1.devtunnels.ms';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface FetchOptions extends RequestInit {
     body?: any;
