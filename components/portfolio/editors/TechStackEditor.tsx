@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TechBadgeModal } from './modals/TechBadgeModal';
-import { TechBadgeData } from '@/components/portfolio_template/design_1/src/constants/tech-badges';
+import { TechBadgeData } from '@/types/tech-badge';
 import { apiRequest } from '@/lib/api';
 
 interface TechStackEditorProps {

@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Search, Plus, X, Globe, Code } from "lucide-react";
-import { DESCRIPTION_TECH_BADGES, TechBadgeData } from "@/components/portfolio_template/design_1/src/constants/tech-badges";
+import { DESCRIPTION_TECH_BADGES, TechBadgeData } from "@/types/tech-badge";
 import { AutoResizeTextarea } from "@/components/ui/AutoResizeTextarea";
 import { apiRequest } from "@/lib/api";
 
