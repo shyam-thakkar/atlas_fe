@@ -10,7 +10,7 @@ interface AuthContextType {
     isLoading: boolean;
     login: (email: string, password: string) => Promise<void>;
     signupAndLogin: (email: string, password: string, name: string) => Promise<void>;
-    loginWithGoogle: (idToken: string) => Promise<void>;
+    loginWithGoogle: () => void; // Changed: no idToken needed, just redirects
     logout: () => void;
 }
 
@@ -153,13 +153,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await handleAuthSuccess();
     };
 
-    const loginWithGoogle = async (idToken: string) => {
-        const response = await auth.googleLogin(idToken);
-        if (response.tokens) {
-            localStorage.setItem('access_token', response.tokens.access);
-            localStorage.setItem('refresh_token', response.tokens.refresh);
-        }
-        await handleAuthSuccess();
+    const loginWithGoogle = () => {
+        // Use OAuth redirect flow - NO fetch, NO CORS
+        const { googleAuth } = require('@/lib/googleAuth');
+        googleAuth.initiateLogin();
+        // User will be redirected to Google, then back to our callback URL
     };
     const logout = () => {
         performLogout(true);

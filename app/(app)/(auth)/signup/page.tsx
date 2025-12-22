@@ -8,11 +8,7 @@ import { AuthInput } from '@/components/AuthInput';
 import { AuthButton } from '@/components/AuthButton';
 import { AuthDivider } from '@/components/AuthDivider';
 import { GoogleButton } from '@/components/GoogleButton';
-import { auth } from '@/lib/auth';
-import { GoogleScript, initializeGoogleOneTap, renderGoogleButton } from '@/lib/googleScript';
-
 import { useAuth } from '@/context/AuthContext';
-// ... other imports
 
 export default function SignupPage() {
   const router = useRouter();
@@ -46,24 +42,13 @@ export default function SignupPage() {
   };
 
 
-  const handleGoogleSuccess = async (response: any) => {
-    try {
-      setIsLoading(true);
-      // Backend expects { id_token: string }
-      await loginWithGoogle(response.credential);
-    } catch (err: any) {
-      setError(err.message || 'Google sign in failed');
-      setIsLoading(false);
-    }
+  const handleGoogleLogin = () => {
+    // Simply redirect to Google OAuth - no CORS issues
+    loginWithGoogle();
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50/50 px-4 py-12 sm:px-6 lg:px-8">
-      <GoogleScript onLoad={() => {
-        if (initializeGoogleOneTap(handleGoogleSuccess)) {
-          renderGoogleButton('google-signup-btn-overlay');
-        }
-      }} />
       <AuthCard
         title="Create an account"
         description="Enter your details to get started"
@@ -109,7 +94,7 @@ export default function SignupPage() {
 
           <AuthDivider />
 
-          <GoogleButton id="google-signup-btn" onClick={() => { }}>
+          <GoogleButton onClick={handleGoogleLogin}>
             Continue with Google
           </GoogleButton>
 

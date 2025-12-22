@@ -8,11 +8,7 @@ import { AuthInput } from '@/components/AuthInput';
 import { AuthButton } from '@/components/AuthButton';
 import { AuthDivider } from '@/components/AuthDivider';
 import { GoogleButton } from '@/components/GoogleButton';
-import { auth } from '@/lib/auth';
-import { GoogleScript, initializeGoogleOneTap, renderGoogleButton } from '@/lib/googleScript';
-
 import { useAuth } from '@/context/AuthContext';
-// ... other imports
 
 export default function LoginPage() {
   const router = useRouter();
@@ -44,23 +40,13 @@ export default function LoginPage() {
     }
   };
 
-  const handleGoogleSuccess = async (response: any) => {
-    try {
-      setIsLoading(true);
-      await loginWithGoogle(response.credential);
-    } catch (err: any) {
-      setError(err.message || 'Google sign in failed');
-      setIsLoading(false);
-    }
+  const handleGoogleLogin = () => {
+    // Simply redirect to Google OAuth - no CORS issues
+    loginWithGoogle();
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50/50 px-4 py-12 sm:px-6 lg:px-8">
-      <GoogleScript onLoad={() => {
-        if (initializeGoogleOneTap(handleGoogleSuccess)) {
-          renderGoogleButton('google-btn-container-overlay');
-        }
-      }} />
       <AuthCard
         title="Welcome back"
         description="Enter your email to sign in to your account"
@@ -97,7 +83,7 @@ export default function LoginPage() {
 
           <AuthDivider />
 
-          <GoogleButton id="google-btn-container" onClick={() => { }}>
+          <GoogleButton onClick={handleGoogleLogin}>
             Continue with Google
           </GoogleButton>
 
