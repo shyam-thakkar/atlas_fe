@@ -38,11 +38,6 @@ export const auth = {
     });
   },
 
-  googleLogin: async (idToken: string) => {
-    const { googleAuth } = await import('./googleAuth');
-    return googleAuth.login(idToken) as Promise<AuthResponse>;
-  },
-
   // Validate session and get user info
   getCurrentUser: async () => {
     return apiRequest<UserResponse>('/api/auth/me/', {
