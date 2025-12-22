@@ -9,6 +9,7 @@ interface DynamicSocialIconProps {
     platform: string; // e.g., "github", "linkedin"
     url: string;
     className?: string;
+    showLabel?: boolean; // Show platform name beside icon
 }
 
 interface SocialApiResponse {
@@ -18,7 +19,7 @@ interface SocialApiResponse {
     color_variant: 'colored' | 'black' | 'white';
 }
 
-export function DynamicSocialIcon({ platform, url, className = "" }: DynamicSocialIconProps) {
+export function DynamicSocialIcon({ platform, url, className = "", showLabel = false }: DynamicSocialIconProps) {
     const [data, setData] = useState<SocialApiResponse | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -62,12 +63,17 @@ export function DynamicSocialIcon({ platform, url, className = "" }: DynamicSoci
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`group relative flex items-center justify-center p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all duration-300 hover:scale-110 hover:border-zinc-300 dark:hover:border-zinc-600 ${className}`}
+                className={`group relative flex items-center gap-2 ${showLabel ? 'px-3 py-1.5' : 'p-2'} rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all duration-300 hover:scale-105 hover:border-zinc-300 dark:hover:border-zinc-600 ${className}`}
                 title={platform}
             >
                 <svg className="w-5 h-5 text-zinc-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                 </svg>
+                {showLabel && (
+                    <span className="font-medium text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 capitalize">
+                        {platform}
+                    </span>
+                )}
             </a>
         );
     }
@@ -94,7 +100,7 @@ export function DynamicSocialIcon({ platform, url, className = "" }: DynamicSoci
             href={url}
             target={url.startsWith("mailto:") ? undefined : "_blank"}
             rel={url.startsWith("mailto:") ? undefined : "noopener noreferrer"}
-            className={`group relative flex items-center justify-center p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all duration-300 hover:scale-110 hover:border-zinc-300 dark:hover:border-zinc-600 ${className}`}
+            className={`group relative flex items-center gap-2 ${showLabel ? 'px-3 py-1.5' : 'p-2'} rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all duration-300 hover:scale-105 hover:border-zinc-300 dark:hover:border-zinc-600 ${className}`}
             title={data.display_name}
         >
             <img
@@ -105,11 +111,18 @@ export function DynamicSocialIcon({ platform, url, className = "" }: DynamicSoci
                     e.currentTarget.style.display = 'none';
                 }}
             />
-            {/* Tooltip */}
-            <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-medium rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-10">
-                {data.display_name}
-                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-900 dark:border-t-zinc-100" />
-            </span>
+            {showLabel && (
+                <span className="font-medium text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-zinc-100">
+                    {data.display_name}
+                </span>
+            )}
+            {/* Tooltip - Only show when label is hidden */}
+            {!showLabel && (
+                <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-medium rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-10">
+                    {data.display_name}
+                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-900 dark:border-t-zinc-100" />
+                </span>
+            )}
         </a>
     );
 }

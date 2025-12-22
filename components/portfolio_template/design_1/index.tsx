@@ -271,10 +271,7 @@ export function PortfolioDesign1({ data }: PortfolioDesign1Props) {
               </section>
 
               {/* Contact Section */}
-              <ContactSection />
-
-              {/* Spacer for Chat Button */}
-              <div className="h-6" />
+              <ContactSection socials={data.socials} />
             </>
           ) : (
             /* Model Card View */

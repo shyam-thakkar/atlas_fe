@@ -220,9 +220,6 @@ export default function Home() {
 
             {/* Contact Section */}
             <ContactSection />
-
-            {/* Spacer for Chat Button */}
-            <div className="h-6" />
           </>
         ) : (
           /* Model Card View */
