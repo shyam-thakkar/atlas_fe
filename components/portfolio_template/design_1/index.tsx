@@ -16,15 +16,28 @@ import { DynamicSocialIcon } from "./src/components/dynamic-social-icon";
 
 interface PortfolioDesign1Props {
   data: StructuredPortfolio | null;
+  fullWidth?: boolean; // Use full width when in iframe/preview mode
 }
 
-export function PortfolioDesign1({ data }: PortfolioDesign1Props) {
+export function PortfolioDesign1({ data, fullWidth = false }: PortfolioDesign1Props) {
   const [view, setView] = useState<'main' | 'model-card'>('main');
   const [selectedProjectIndex, setSelectedProjectIndex] = useState<number | null>(null);
   const [isDark, setIsDark] = useState(false);
 
+  // Compute content width class based on fullWidth prop
+  const contentWidthClass = fullWidth ? 'w-full' : 'w-full md:w-[60%]';
+
   const handleThemeToggle = () => {
-    setIsDark(!isDark);
+    const newIsDark = !isDark;
+    setIsDark(newIsDark);
+
+    // Notify parent window about theme change (for iframe browser chrome sync)
+    if (window.parent !== window) {
+      window.parent.postMessage({
+        type: 'PORTFOLIO_THEME_CHANGE',
+        isDark: newIsDark
+      }, '*');
+    }
   };
 
   // Use passed data or fallbacks
@@ -84,10 +97,10 @@ export function PortfolioDesign1({ data }: PortfolioDesign1Props) {
 
   return (
     <div className={isDark ? "dark" : ""}>
-      <div className="portfolio-transition min-h-screen w-full bg-gradient-to-br from-zinc-50 via-white to-zinc-100 dark:from-zinc-950 dark:via-black dark:to-zinc-900 font-sans text-zinc-900 dark:text-zinc-100">
+      <div className="portfolio-transition min-h-screen w-full bg-gradient-to-br from-zinc-50 via-white to-zinc-100 dark:from-zinc-950 dark:via-black dark:to-zinc-900 text-zinc-900 dark:text-zinc-100" style={{ fontFamily: '"Sora", sans-serif' }}>
         {/* Sticky Header with Backdrop Blur */}
         <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-zinc-950/80 shadow-lg">
-          <div className="mx-auto w-full md:w-[70%] px-4 md:px-8 py-4 md:border-l-2 md:border-r-2 border-b-2 border-zinc-200 dark:border-zinc-800">
+          <div className={`mx-auto ${contentWidthClass} px-4 md:px-8 py-4 ${!fullWidth ? 'md:border-l-2 md:border-r-2' : ''} border-b-2 border-zinc-200 dark:border-zinc-800`}>
             <div className="flex items-center justify-between">
               {/* Profile Section - Clickable */}
               <div
@@ -129,7 +142,7 @@ export function PortfolioDesign1({ data }: PortfolioDesign1Props) {
         </header>
 
         {/* Content Container with Vertical Borders */}
-        <main className="mx-auto w-full md:w-[70%] min-h-screen px-4 md:px-8 py-6 md:border-l-2 md:border-r-2 border-zinc-200 dark:border-zinc-800 transition-colors duration-300">
+        <main className={`mx-auto ${contentWidthClass} px-4 md:px-8 py-6 ${!fullWidth ? 'md:border-l-2 md:border-r-2' : ''} border-zinc-200 dark:border-zinc-800 transition-colors duration-300`}>
           {view === 'main' ? (
             <>
               {/* Hero Section */}
@@ -167,7 +180,7 @@ export function PortfolioDesign1({ data }: PortfolioDesign1Props) {
 
                 <div>
                   {/* Description with Badges */}
-                  <div className="text-lg leading-relaxed text-zinc-600 dark:text-zinc-400 mb-8 transition-colors duration-300">
+                  <div className="text-lg leading-loose text-zinc-600 dark:text-zinc-400 mb-8 transition-colors duration-300" style={{ lineHeight: '2.2' }}>
                     {renderBioWithBadges(personalInfo.description)}
                   </div>
 

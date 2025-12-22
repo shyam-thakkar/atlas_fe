@@ -32,6 +32,15 @@ export function PortfolioManager({ onFinish, isModal = false, onDataChange, defa
     const [isEditing, setIsEditing] = useState(defaultEdit);
     const [editedData, setEditedData] = useState<StructuredPortfolio | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [showEditHint, setShowEditHint] = useState(false);
+
+    // Handle click on content when not editing - show hint notification
+    const handleContentClick = () => {
+        if (!isEditing && editedData) {
+            setShowEditHint(true);
+            setTimeout(() => setShowEditHint(false), 3000);
+        }
+    };
 
     // Notify parent of data changes
     useEffect(() => {
@@ -111,120 +120,103 @@ export function PortfolioManager({ onFinish, isModal = false, onDataChange, defa
     const currentStepConfig = STEPS[currentStep];
 
     const containerInfoClass = isModal
-        ? "bg-white w-full max-w-[90vw] h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex animate-in zoom-in-95 duration-300"
-        : "bg-white w-full h-full flex";
+        ? "bg-white dark:bg-zinc-950 w-full max-w-[90vw] h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex animate-in zoom-in-95 duration-300"
+        : "w-full h-full flex p-4 gap-0 bg-gray-100 dark:bg-zinc-900";
 
     return (
         <div className={containerInfoClass}>
-            {/* LEFT PANEL: NAVIGATION */}
-            <div className="w-[280px] bg-gray-50 dark:bg-zinc-900 border-r border-gray-200 dark:border-zinc-800 flex flex-col h-full flex-shrink-0">
-                <div className="h-16 flex items-center px-6 border-b border-gray-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-950/50 backdrop-blur sticky top-0 z-10">
-                    <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 tracking-wide uppercase">Portfolio Sections</h3>
-                </div>
-                <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-                    <nav className="space-y-2">
-                        {STEPS.map((step, index) => (
+            {/* LEFT: Diary-style Tabs with Actions */}
+            <div className="w-52 flex-shrink-0 flex flex-col overflow-visible rounded-l-2xl bg-gray-200 dark:bg-zinc-800">
+                {/* Action Buttons at Top */}
+                <div className="p-3 border-b border-gray-300 dark:border-zinc-700 flex items-center gap-2 transition-all duration-300">
+                    {!isEditing ? (
+                        <button
+                            onClick={toggleEdit}
+                            className="w-full px-3 py-2 bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 border border-gray-300 dark:border-zinc-600 rounded-lg font-medium text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all shadow-sm"
+                        >
+                            Edit
+                        </button>
+                    ) : (
+                        <>
                             <button
-                                key={step.id}
-                                onClick={() => setCurrentStep(index)}
-                                className={`w-full flex items-start p-4 rounded-xl text-left transition-all ${
-                                    currentStep === index
-                                        ? 'bg-white dark:bg-zinc-800 shadow-md border border-gray-200 dark:border-zinc-700 ring-1 ring-black/5 scale-[1.02]'
-                                        : 'hover:bg-gray-100 dark:hover:bg-zinc-800 hover:scale-[1.01] text-gray-600 dark:text-gray-400'
-                                }`}
+                                onClick={toggleEdit}
+                                className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 border border-gray-300 dark:border-zinc-600 rounded-lg font-medium text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all shadow-sm"
                             >
-                                <div className={`mt-1 w-2.5 h-2.5 rounded-full mr-4 flex-shrink-0 ${currentStep === index ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-gray-600'}`} />
-                                <div>
-                                    <span className={`block text-base font-bold ${currentStep === index ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}`}>
-                                        {step.title}
-                                    </span>
-                                    {currentStep === index && (
-                                        <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
-                                            {step.description}
-                                        </span>
-                                    )}
-                                </div>
+                                Cancel
                             </button>
-                        ))}
-                    </nav>
+                            <button
+                                onClick={handleSave}
+                                disabled={isSaving}
+                                className="flex-1 px-3 py-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-lg font-medium text-sm shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isSaving ? 'Saving...' : 'Save All'}
+                            </button>
+                        </>
+                    )}
+                </div>
+
+                {/* Section Tabs - Diary Style */}
+                <div className="flex-1 overflow-y-auto py-3 flex flex-col">
+                    {STEPS.map((step, index) => (
+                        <button
+                            key={step.id}
+                            onClick={() => setCurrentStep(index)}
+                            className={`relative text-left font-medium transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1.0)] 
+                                before:absolute before:bottom-full before:right-0 before:h-5 before:w-5 before:content-[""] before:transition-opacity before:duration-300
+                                after:absolute after:top-full after:right-0 after:h-5 after:w-5 after:content-[""] after:transition-opacity after:duration-300
+                                before:bg-[radial-gradient(circle_at_0_0,transparent_1.25rem,white_1.25rem)] dark:before:bg-[radial-gradient(circle_at_0_0,transparent_1.25rem,#18181b_1.25rem)]
+                                after:bg-[radial-gradient(circle_at_0_100%,transparent_1.25rem,white_1.25rem)] dark:after:bg-[radial-gradient(circle_at_0_100%,transparent_1.25rem,#18181b_1.25rem)]
+                                ${currentStep === index
+                                    ? `
+                                    bg-white dark:bg-zinc-950 
+                                    text-violet-600 dark:text-violet-400 
+                                    font-bold text-lg py-5 px-4
+                                    ml-2 rounded-l-2xl rounded-r-none 
+                                    translate-x-[1px] z-20 shadow-lg
+                                    before:opacity-100 after:opacity-100
+                                  `
+                                    : `
+                                    text-gray-600 dark:text-zinc-400 
+                                    hover:text-gray-800 dark:hover:text-zinc-200 
+                                    hover:bg-gray-300/50 dark:hover:bg-zinc-700/50 
+                                    mx-2 py-3 px-4 rounded-lg text-sm
+                                    before:opacity-0 after:opacity-0
+                                  `
+                                }`}
+                        >
+                            {step.title}
+                        </button>
+                    ))}
                 </div>
             </div>
 
-            {/* RIGHT PANEL: EDITOR */}
-            <div className="flex-1 flex flex-col h-full bg-white relative min-w-0">
-                {/* Header */}
-                <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">
-                    <div>
-                        <div className="flex items-center gap-2 mb-2">
-                            <span className="w-2 h-2 rounded-full bg-indigo-600"></span>
-                            <span className="text-sm font-bold text-indigo-600 tracking-wide uppercase">
-                                {isEditing ? "Editing Portfolio" : "Reviewing Portfolio"}
-                            </span>
+            {/* RIGHT: Content Area - Connected to selected tab */}
+            <div className="flex-1 flex flex-col h-full bg-white dark:bg-zinc-950 relative min-w-0 rounded-r-2xl shadow-xl">
+                {/* Edit Hint Toast - appears on click when in review mode */}
+                <div className={`absolute top-4 right-4 z-20 transition-all duration-300 ease-out ${
+                    showEditHint 
+                        ? 'opacity-100 translate-y-0' 
+                        : 'opacity-0 -translate-y-2 pointer-events-none'
+                }`}>
+                    <div className="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 px-4 py-3 rounded-xl shadow-xl flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-violet-500/20 dark:bg-violet-500/30 flex items-center justify-center flex-shrink-0">
+                            <svg className="w-4 h-4 text-violet-400 dark:text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
                         </div>
-                        <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">{currentStepConfig.title}</h2>
-                        <p className="text-lg text-gray-500 mt-2 font-medium">{currentStepConfig.description}</p>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                        {!isEditing ? (
-                            <>
-                                <button
-                                    onClick={toggleEdit}
-                                    className="px-6 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg font-medium text-sm hover:bg-gray-50 transition-all shadow-sm"
-                                >
-                                    Edit Portfolio
-                                </button>
-                                {onFinish && (
-                                    <button
-                                        onClick={handleSave}
-                                        disabled={isSaving || !editedData}
-                                        className="px-6 py-2.5 bg-indigo-600 text-white rounded-lg font-medium text-sm shadow-sm hover:bg-indigo-700 transition-all flex items-center gap-2"
-                                    >
-                                        {isSaving ? (
-                                            <>
-                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                                Finalizing...
-                                            </>
-                                        ) : (
-                                            <>Looks Good, Continue</>
-                                        )}
-                                    </button>
-                                )}
-                            </>
-                        ) : (
-                            <>
-                                <button
-                                    onClick={toggleEdit}
-                                    className="px-4 py-2.5 text-gray-600 font-medium text-sm hover:text-gray-900 transition-all"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleSave}
-                                    disabled={isSaving}
-                                    className="px-6 py-2.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg font-medium text-sm hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors flex items-center gap-2"
-                                >
-                                    {isSaving ? (
-                                        <>
-                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                            Saving...
-                                        </>
-                                    ) : (
-                                        <>Save All Changes</>
-                                    )}
-                                </button>
-                            </>
-                        )}
+                        <span className="text-sm font-medium">To edit details, please click the <strong>Edit</strong> button</span>
                     </div>
                 </div>
-
                 {/* Editor Content Area */}
-                <div className={`flex-1 overflow-y-auto p-6 bg-white ${!isEditing ? 'opacity-80 grayscale-[0.3]' : ''}`}>
+                <div 
+                    className="flex-1 overflow-y-auto p-6"
+                    onClick={handleContentClick}
+                >
                     {isLoading ? (
                         <div className="h-full flex items-center justify-center">
                             <div className="flex flex-col items-center gap-3">
-                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-                                <span className="text-gray-500 font-medium">Loading your portfolio...</span>
+                                <div className="animate-spin rounded-full h-10 w-10 border-2 border-violet-600/20 border-t-violet-600"></div>
+                                <span className="text-gray-500 dark:text-zinc-400 font-medium text-sm">Loading your portfolio...</span>
                             </div>
                         </div>
                     ) : error ? (

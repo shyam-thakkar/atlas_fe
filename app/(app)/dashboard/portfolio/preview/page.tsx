@@ -1,47 +1,71 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { profile } from '@/lib/profile';
-import { StructuredPortfolio } from '@/types/portfolio';
-import { PortfolioPreview } from '@/components/portfolio/PortfolioPreview';
+import React, { useRef, useEffect, useState } from 'react';
 
 export default function PortfolioPreviewPage() {
-    const [data, setData] = useState<StructuredPortfolio | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const iframeRef = useRef<HTMLIFrameElement>(null);
+    const [iframeTheme, setIframeTheme] = useState<'light' | 'dark'>('light');
 
+    // Refresh iframe data when component mounts
     useEffect(() => {
-        profile.getStructuredPortfolio()
-            .then(setData)
-            .finally(() => setIsLoading(false));
+        const timer = setTimeout(() => {
+            if (iframeRef.current?.contentWindow) {
+                iframeRef.current.contentWindow.postMessage({
+                    type: 'PORTFOLIO_DATA_REFRESH'
+                }, '*');
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
     }, []);
 
-    if (isLoading) return (
-        <div className="flex h-full items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-        </div>
-    );
+    // Listen for theme changes from iframe
+    useEffect(() => {
+        const handleMessage = (event: MessageEvent) => {
+            if (event.data.type === 'PORTFOLIO_THEME_CHANGE') {
+                setIframeTheme(event.data.isDark ? 'dark' : 'light');
+            }
+        };
 
-    if (!data) return (
-        <div className="p-8 text-center">
-            Portfolio data not found.
-        </div>
-    );
+        window.addEventListener('message', handleMessage);
+        return () => window.removeEventListener('message', handleMessage);
+    }, []);
+
+    // Browser chrome classes based on iframe theme
+    const chromeClasses = iframeTheme === 'dark'
+        ? 'bg-zinc-900 border-zinc-700'
+        : 'bg-gray-50 border-gray-200';
+    const chromeLabelClasses = iframeTheme === 'dark'
+        ? 'text-gray-400'
+        : 'text-gray-500';
+    const badgeClasses = iframeTheme === 'dark'
+        ? 'bg-green-900 text-green-300'
+        : 'bg-green-100 text-green-700';
 
     return (
-        <div className="w-full h-full overflow-y-auto bg-gray-50">
-            <div className="max-w-4xl mx-auto py-12 px-6">
-                <div className="bg-white shadow-xl rounded-2xl p-12 space-y-12">
-                    <div className="pb-8 border-b border-gray-100 flex items-center justify-center relative">
-                        <span className="text-xs font-mono text-gray-400 absolute left-0 top-0">LIVE PREVIEW MODE</span>
-                        {/* A nice header for the preview wrapper? Optional. */}
-                        <div className="text-center">
-                            <span className="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full font-bold">LIVE PREVIEW</span>
-                        </div>
+        <div className="h-full flex flex-col overflow-hidden bg-gray-100 dark:bg-zinc-900 p-8">
+            <div className="flex-1 max-w-8xl mx-auto w-full shadow-2xl rounded-xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 flex flex-col">
+                {/* Browser Chrome - synced with iframe theme */}
+                <div className={`${chromeClasses} border-b p-2 flex justify-between items-center px-4 transition-colors duration-300 flex-shrink-0`}>
+                    <div className="flex gap-1.5">
+                        <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                        <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                        <div className="w-3 h-3 rounded-full bg-green-400"></div>
                     </div>
-
-                    {/* Render the portfolio components */}
-                    <PortfolioPreview data={data} />
+                    <div className="flex items-center gap-3">
+                        <span className={`px-3 py-1 ${badgeClasses} text-xs rounded-full font-bold transition-colors duration-300`}>LIVE PREVIEW</span>
+                        <span className={`text-xs font-mono ${chromeLabelClasses} transition-colors duration-300`}>preview: design_1</span>
+                    </div>
                 </div>
+
+                {/* Iframe Preview - scrolls internally */}
+                <iframe
+                    ref={iframeRef}
+                    src="/portfolio-preview?mode=preview"
+                    className="w-full flex-1 border-0"
+                    title="Portfolio Preview"
+                    sandbox="allow-scripts allow-same-origin"
+                />
             </div>
         </div>
     );

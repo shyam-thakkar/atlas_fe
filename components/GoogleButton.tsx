@@ -5,22 +5,22 @@ interface GoogleButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement
 }
 
 export function GoogleButton({ children, className, ...props }: GoogleButtonProps) {
-    // We accept an id prop via ...props to identify the container if needed
-    // For the overlay method, we can stick to using an internal ID if passed, or just wrapping
-
     return (
         <div className="relative w-full group">
             {/* The Custom Button - Visual Only */}
             <button
                 type="button"
                 className={`
-          w-full h-10 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md
-          hover:bg-gray-50 hover:border-gray-400 transition-all duration-200
-          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200
-          flex items-center justify-center gap-3 shadow-sm
-          transform active:scale-[0.98]
-          ${className || ''}
-        `}
+                    w-full h-11 bg-white dark:bg-zinc-800/50 border border-gray-300 dark:border-zinc-700/50
+                    text-gray-700 dark:text-zinc-300 text-sm font-medium rounded-lg
+                    hover:bg-gray-50 dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-600
+                    transition-all duration-300
+                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 
+                    dark:focus:ring-offset-zinc-900 dark:focus:ring-zinc-700
+                    flex items-center justify-center gap-3
+                    transform active:scale-[0.98]
+                    ${className || ''}
+                `}
                 {...props}
             >
                 <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -53,3 +53,4 @@ export function GoogleButton({ children, className, ...props }: GoogleButtonProp
         </div>
     );
 }
+

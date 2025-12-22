@@ -75,20 +75,20 @@ export function ResumeUpload({ onUploadSuccess, hasExistingResume }: ResumeUploa
   if (hasExistingResume && !isUploading) {
     return (
       <div className="w-full">
-        <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 p-6 transition-all duration-200">
+        <div className="rounded-2xl border border-gray-200 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/60 p-6 transition-all duration-200">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center flex-shrink-0">
+            <div className="w-11 h-11 rounded-xl bg-emerald-100 dark:bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
               <svg className="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Resume uploaded</p>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Your resume is ready for analysis</p>
+              <p className="text-sm font-medium text-gray-800 dark:text-white">Resume uploaded</p>
+              <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Your resume is ready for analysis</p>
             </div>
             <button
               onClick={handleClick}
-              className="text-xs font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors px-3 py-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              className="text-xs font-medium text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition-colors px-3 py-1.5 rounded-lg hover:bg-violet-50 dark:hover:bg-violet-500/10 border border-transparent hover:border-violet-200 dark:hover:border-violet-500/20"
             >
               Replace
             </button>
@@ -121,13 +121,13 @@ export function ResumeUpload({ onUploadSuccess, hasExistingResume }: ResumeUploa
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={`
-          relative rounded-xl border transition-all duration-200 ease-out cursor-pointer
+          relative rounded-2xl border-2 transition-all duration-200 ease-out cursor-pointer
           ${isDragging 
-            ? 'border-indigo-400 dark:border-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/20' 
-            : 'border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-600 bg-white dark:bg-zinc-900'
+            ? 'border-violet-400 dark:border-violet-500 bg-violet-50/50 dark:bg-violet-950/20' 
+            : 'border-dashed border-gray-300 dark:border-zinc-700 hover:border-violet-400 dark:hover:border-violet-500/50 bg-white dark:bg-zinc-900/60'
           }
           ${isUploading ? 'opacity-60 pointer-events-none' : ''}
-          p-8 flex flex-col items-center justify-center text-center min-h-[180px]
+          p-8 flex flex-col items-center justify-center text-center min-h-[200px]
         `}
       >
         <input 
@@ -144,10 +144,10 @@ export function ResumeUpload({ onUploadSuccess, hasExistingResume }: ResumeUploa
         )}
 
         <div className={`
-          w-12 h-12 mb-4 rounded-xl flex items-center justify-center transition-all duration-200
+          w-14 h-14 mb-4 rounded-2xl flex items-center justify-center transition-all duration-200
           ${isDragging 
-            ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400' 
-            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500'
+            ? 'bg-violet-100 dark:bg-violet-900/50 text-violet-600 dark:text-violet-400' 
+            : 'bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500'
           }
         `}>
           {isUploading ? (
@@ -163,11 +163,11 @@ export function ResumeUpload({ onUploadSuccess, hasExistingResume }: ResumeUploa
         </div>
 
         <div className="space-y-1">
-          <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <p className="text-sm font-medium text-gray-700 dark:text-zinc-300">
             {isUploading ? 'Uploading...' : 'Drop your resume here'}
           </p>
-          <p className="text-xs text-zinc-400 dark:text-zinc-500">
-            {isUploading ? 'Extracting content' : 'PDF or DOCX, up to 5MB'}
+          <p className="text-xs text-gray-400 dark:text-zinc-500">
+            {isUploading ? 'Extracting content' : 'or click to browse • PDF or DOCX, up to 5MB'}
           </p>
         </div>
       </div>

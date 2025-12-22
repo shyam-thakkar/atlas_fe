@@ -48,14 +48,14 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50/50 px-4 py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-950 px-4 py-12 sm:px-6 lg:px-8">
       <AuthCard
         title="Create an account"
         description="Enter your details to get started"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="p-3 text-sm text-red-500 bg-red-50 border border-red-100 rounded-md">
+            <div className="p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-lg">
               {error}
             </div>
           )}
@@ -98,9 +98,9 @@ export default function SignupPage() {
             Continue with Google
           </GoogleButton>
 
-          <p className="mt-6 text-center text-sm text-gray-500">
+          <p className="mt-6 text-center text-sm text-gray-500 dark:text-zinc-400">
             Already have an account?{' '}
-            <Link href="/login" className="font-semibold text-gray-900 hover:text-gray-700 hover:underline underline-offset-4 transition-colors">
+            <Link href="/login" className="font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-500 dark:hover:text-violet-300 hover:underline underline-offset-4 transition-colors">
               Sign in
             </Link>
           </p>

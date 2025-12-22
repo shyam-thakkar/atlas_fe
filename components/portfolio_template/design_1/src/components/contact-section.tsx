@@ -14,7 +14,7 @@ export function ContactSection({ socials, contactMessage }: ContactSectionProps)
   const message = contactMessage || defaultMessage;
   
   return (
-    <section className="py-12 border-t-2 border-zinc-200 dark:border-zinc-800 mt-12">
+    <section className="py-8 border-t-2 border-zinc-200 dark:border-zinc-800 mt-8">
       <div className="flex flex-col items-center text-center">
         {/* Header with lines */}
         <div className="w-full flex items-center justify-center gap-4 mb-8">
@@ -56,7 +56,7 @@ export function ContactSection({ socials, contactMessage }: ContactSectionProps)
         </div>
 
         {/* Bottom Line */}
-        <div className="w-full h-[2px] bg-zinc-200 dark:bg-zinc-800 mt-12" />
+        <div className="w-full h-[2px] bg-zinc-200 dark:bg-zinc-800 mt-8" />
       </div>
     </section>
   );
