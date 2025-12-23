@@ -211,42 +211,42 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
 
     return createPortal(
         <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="bg-white w-full max-w-lg rounded-xl shadow-2xl overflow-hidden border border-zinc-200 flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
+            <div className="bg-white dark:bg-zinc-900 w-full max-w-lg rounded-xl shadow-2xl overflow-hidden border border-zinc-200 dark:border-zinc-700 flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
 
                 {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b border-zinc-100">
-                    <h2 className="text-lg font-bold text-zinc-900">
+                <div className="flex items-center justify-between p-4 border-b border-zinc-100 dark:border-zinc-800">
+                    <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
                         {isCustomMode ? "Add Custom Tech Badge" : "Select Technology"}
                     </h2>
-                    <button onClick={onClose} className="p-1 rounded-md hover:bg-zinc-100 transition-colors">
-                        <X className="w-5 h-5 text-zinc-500" />
+                    <button onClick={onClose} className="p-1 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+                        <X className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />
                     </button>
                 </div>
 
                 {!isCustomMode ? (
                     /* Search & Select Mode */
                     <>
-                        <div className="p-4 border-b border-zinc-100 bg-zinc-50/50">
+                        <div className="p-4 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/50">
                             <div className="flex gap-2">
                                 <div className="relative flex-1">
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                                     <input
                                         type="text"
                                         placeholder="Search technologies (e.g. Python, React)..."
-                                        className="w-full pl-9 pr-10 py-2 bg-white border border-zinc-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-black transition-all text-zinc-900"
+                                        className="w-full pl-9 pr-10 py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm outline-none focus:ring-2 focus:ring-black dark:focus:ring-zinc-500 transition-all text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400"
                                         value={searchQuery}
                                         onChange={e => setSearchQuery(e.target.value)}
                                         autoFocus
                                     />
                                     {isLoading && (
                                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                            <div className="w-4 h-4 border-2 border-zinc-300 border-t-zinc-600 rounded-full animate-spin"></div>
+                                            <div className="w-4 h-4 border-2 border-zinc-300 dark:border-zinc-600 border-t-zinc-600 dark:border-t-zinc-300 rounded-full animate-spin"></div>
                                         </div>
                                     )}
                                 </div>
                                 <button
                                     onClick={() => setIsCustomMode(true)}
-                                    className="flex items-center gap-1.5 px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-zinc-800 transition-colors whitespace-nowrap"
+                                    className="flex items-center gap-1.5 px-4 py-2 bg-black dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg text-sm font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors whitespace-nowrap"
                                 >
                                     <Plus className="w-4 h-4" />
                                     Add Custom
@@ -265,9 +265,9 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
                                                 onSelect(badge);
                                                 onClose();
                                             }}
-                                            className="flex items-center gap-2 p-2 rounded-lg border border-zinc-200 hover:border-black hover:bg-zinc-50 transition-all text-left group"
+                                            className="flex items-center gap-2 p-2 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all text-left group"
                                         >
-                                            <div className="w-8 h-8 flex items-center justify-center bg-zinc-100 rounded p-1 group-hover:scale-110 transition-transform">
+                                            <div className="w-8 h-8 flex items-center justify-center bg-zinc-100 dark:bg-zinc-800 rounded p-1 group-hover:scale-110 transition-transform">
                                                 {badge.imageSrc ? (
                                                     <img
                                                         src={badge.imageSrc}
@@ -280,38 +280,38 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
                                                     <Code className="w-4 h-4 text-zinc-400" />
                                                 )}
                                             </div>
-                                            <span className="text-sm font-medium text-zinc-700 truncate">
+                                            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300 truncate">
                                                 {badge.name}
                                             </span>
                                         </button>
                                     ))}
                                     {isLoadingMore && (
-                                        <div className="col-span-full py-4 flex justify-center text-zinc-400 text-sm">
+                                        <div className="col-span-full py-4 flex justify-center text-zinc-400 dark:text-zinc-500 text-sm">
                                             Loading more...
                                         </div>
                                     )}
                                 </div>
                             ) : isLoading ? (
                                 <div className="flex flex-col items-center justify-center py-20">
-                                    <div className="w-8 h-8 border-4 border-zinc-200 border-t-black rounded-full animate-spin mb-4"></div>
-                                    <p className="text-zinc-500 text-sm">Loading technologies...</p>
+                                    <div className="w-8 h-8 border-4 border-zinc-200 dark:border-zinc-700 border-t-black dark:border-t-zinc-300 rounded-full animate-spin mb-4"></div>
+                                    <p className="text-zinc-500 dark:text-zinc-400 text-sm">Loading technologies...</p>
                                 </div>
                             ) : (
                                 /* EMPTY STATE */
                                 <div className="flex flex-col items-center justify-center py-12 text-center">
-                                    <div className="w-12 h-12 rounded-full bg-zinc-100 flex items-center justify-center mb-3">
+                                    <div className="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-3">
                                         <Search className="w-6 h-6 text-zinc-400" />
                                     </div>
-                                    <h3 className="text-zinc-900 font-medium mb-1">
+                                    <h3 className="text-zinc-900 dark:text-zinc-100 font-medium mb-1">
                                         {searchQuery ? "No results found" : "Start searching"}
                                     </h3>
-                                    <p className="text-zinc-500 text-sm mb-4">
+                                    <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-4">
                                         {searchQuery ? `Couldn't find "${searchQuery}"` : "Find technologies to add to your bio."}
                                     </p>
                                     {searchQuery && (
                                         <button
                                             onClick={() => setIsCustomMode(true)}
-                                            className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+                                            className="flex items-center gap-2 px-4 py-2 bg-black dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
                                         >
                                             <Plus className="w-4 h-4" />
                                             Add "{searchQuery}"
@@ -321,10 +321,10 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
                             )}
 
                             {(searchQuery === "" && searchResults.length === 0) && ( // Also show custom add button when empty/start
-                                <div className="mt-6 pt-4 border-t border-zinc-100">
+                                <div className="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800">
                                     <button
                                         onClick={() => setIsCustomMode(true)}
-                                        className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-dashed border-zinc-300 rounded-lg text-sm font-medium text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 transition-colors"
+                                        className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-dashed border-zinc-300 dark:border-zinc-600 rounded-lg text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                                     >
                                         <Plus className="w-4 h-4" />
                                         Add Custom Technology
@@ -338,7 +338,7 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
                     <form onSubmit={handleCustomSubmit} className="flex-1 flex flex-col">
                         <div className="p-6 space-y-4 overflow-y-auto flex-1">
                             <div>
-                                <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1.5">
+                                <label className="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
                                     Tech Name
                                 </label>
                                 <input
@@ -347,13 +347,13 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
                                     value={customName}
                                     onChange={e => handleCustomNameChange(e.target.value)}
                                     placeholder="e.g. Next.js"
-                                    className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-black transition-all text-zinc-900"
+                                    className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm outline-none focus:ring-2 focus:ring-black dark:focus:ring-zinc-500 transition-all text-zinc-900 dark:text-zinc-100"
                                 />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1.5">
+                                    <label className="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
                                         Code Name
                                     </label>
                                     <div className="relative">
@@ -361,12 +361,12 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
                                             type="text"
                                             value={customCode}
                                             readOnly
-                                            className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-sm text-zinc-500 font-mono"
+                                            className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm text-zinc-500 dark:text-zinc-400 font-mono"
                                         />
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1.5">
+                                    <label className="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
                                         Icon URL
                                     </label>
                                     <div className="relative">
@@ -375,7 +375,7 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
                                             value={customIcon}
                                             onChange={e => setCustomIcon(e.target.value)}
                                             placeholder="https://..."
-                                            className="w-full pl-9 px-3 py-2 bg-white border border-zinc-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-black transition-all text-zinc-900"
+                                            className="w-full pl-9 px-3 py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm outline-none focus:ring-2 focus:ring-black dark:focus:ring-zinc-500 transition-all text-zinc-900 dark:text-zinc-100"
                                         />
                                         <div className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center">
                                             {customIcon ? (
@@ -396,7 +396,7 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
                             </div>
 
                             <div>
-                                <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1.5">
+                                <label className="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
                                     Documentation URL
                                 </label>
                                 <input
@@ -404,54 +404,54 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
                                     value={customUrl}
                                     onChange={e => setCustomUrl(e.target.value)}
                                     placeholder="https://docs.example.com"
-                                    className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-black transition-all text-zinc-900"
+                                    className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm outline-none focus:ring-2 focus:ring-black dark:focus:ring-zinc-500 transition-all text-zinc-900 dark:text-zinc-100"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">
+                                <label className="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">
                                     Color Variant
                                 </label>
                                 <div className="flex gap-3">
                                     <label className="flex items-center gap-2 cursor-pointer group">
-                                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${customVariant === 'colored' ? 'border-indigo-600 bg-indigo-600' : 'border-zinc-300'}`}>
+                                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${customVariant === 'colored' ? 'border-indigo-600 bg-indigo-600' : 'border-zinc-300 dark:border-zinc-600'}`}>
                                             {customVariant === 'colored' && <div className="w-2 h-2 bg-white rounded-full" />}
                                         </div>
                                         <input type="radio" className="hidden" name="variant" value="colored" checked={customVariant === 'colored'} onChange={() => setCustomVariant('colored')} />
-                                        <span className={`text-sm ${customVariant === 'colored' ? 'font-medium text-zinc-900' : 'text-zinc-600'}`}>Colored</span>
+                                        <span className={`text-sm ${customVariant === 'colored' ? 'font-medium text-zinc-900 dark:text-zinc-100' : 'text-zinc-600 dark:text-zinc-400'}`}>Colored</span>
                                     </label>
                                     <label className="flex items-center gap-2 cursor-pointer group">
-                                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${customVariant === 'black' ? 'border-black bg-black' : 'border-zinc-300'}`}>
-                                            {customVariant === 'black' && <div className="w-2 h-2 bg-white rounded-full" />}
+                                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${customVariant === 'black' ? 'border-black bg-black dark:border-zinc-100 dark:bg-zinc-100' : 'border-zinc-300 dark:border-zinc-600'}`}>
+                                            {customVariant === 'black' && <div className="w-2 h-2 bg-white dark:bg-zinc-900 rounded-full" />}
                                         </div>
                                         <input type="radio" className="hidden" name="variant" value="black" checked={customVariant === 'black'} onChange={() => setCustomVariant('black')} />
-                                        <span className={`text-sm ${customVariant === 'black' ? 'font-medium text-zinc-900' : 'text-zinc-600'}`}>Black</span>
+                                        <span className={`text-sm ${customVariant === 'black' ? 'font-medium text-zinc-900 dark:text-zinc-100' : 'text-zinc-600 dark:text-zinc-400'}`}>Black</span>
                                     </label>
                                     <label className="flex items-center gap-2 cursor-pointer group">
-                                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${customVariant === 'white' ? 'border-zinc-400 bg-zinc-200' : 'border-zinc-300'}`}>
-                                            {customVariant === 'white' && <div className="w-2 h-2 bg-black rounded-full" />}
+                                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${customVariant === 'white' ? 'border-zinc-400 bg-zinc-200 dark:border-zinc-500 dark:bg-zinc-700' : 'border-zinc-300 dark:border-zinc-600'}`}>
+                                            {customVariant === 'white' && <div className="w-2 h-2 bg-black dark:bg-white rounded-full" />}
                                         </div>
                                         <input type="radio" className="hidden" name="variant" value="white" checked={customVariant === 'white'} onChange={() => setCustomVariant('white')} />
-                                        <span className={`text-sm ${customVariant === 'white' ? 'font-medium text-zinc-900' : 'text-zinc-600'}`}>White</span>
+                                        <span className={`text-sm ${customVariant === 'white' ? 'font-medium text-zinc-900 dark:text-zinc-100' : 'text-zinc-600 dark:text-zinc-400'}`}>White</span>
                                     </label>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="p-4 border-t border-zinc-100 bg-zinc-50 flex justify-end gap-3">
+                        <div className="p-4 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50 flex justify-end gap-3">
                             <button
                                 type="button"
                                 onClick={() => setIsCustomMode(false)}
-                                className="px-4 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
+                                className="px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
                             >
                                 Back
                             </button>
                             <button
                                 type="submit"
-                                disabled={isLoading} // Disable button when loading
-                                className="px-6 py-2 bg-black text-white rounded-lg text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-50" // Added disabled styles
+                                disabled={isLoading}
+                                className="px-6 py-2 bg-black dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-50"
                             >
-                                {isLoading ? "Adding..." : "Add Tech Badge"} {/* Change text based on loading state */}
+                                {isLoading ? "Adding..." : "Add Tech Badge"}
                             </button>
                         </div>
                     </form>

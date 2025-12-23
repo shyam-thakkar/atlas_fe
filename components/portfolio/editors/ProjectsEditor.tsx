@@ -1,7 +1,101 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ProjectItem } from '@/types/portfolio';
 import { AutoResizeTextarea } from '@/components/ui/AutoResizeTextarea';
-import { StringArrayInput } from '@/components/ui/StringArrayInput';
+import { TechBadgeModal } from './modals/TechBadgeModal';
+import { TechBadgeData } from '@/types/tech-badge';
+import { apiRequest } from '@/lib/api';
+
+// Mini tech icon component for Projects Editor - smaller than TechStackItem, with remove button
+interface MiniTechItemProps {
+    codeName: string;
+    onRemove: () => void;
+}
+
+function MiniTechItem({ codeName, onRemove }: MiniTechItemProps) {
+    const [techData, setTechData] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [notFound, setNotFound] = useState(false);
+
+    useEffect(() => {
+        const fetchTech = async () => {
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/profile/tech/search/?q=${encodeURIComponent(codeName)}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setTechData(data);
+                    setNotFound(false);
+                } else if (response.status === 404) {
+                    setNotFound(true);
+                }
+            } catch (error) {
+                setNotFound(true);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchTech();
+    }, [codeName]);
+
+    if (loading) {
+        return <div className="w-10 h-10 bg-gray-100 dark:bg-zinc-700 rounded-lg animate-pulse" />;
+    }
+
+    if (notFound || !techData?.icon_path) {
+        return (
+            <div className="relative group">
+                <button
+                    onClick={onRemove}
+                    className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-600 z-10"
+                    title="Remove"
+                >
+                    <svg className="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                <div 
+                    className="w-10 h-10 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 rounded-lg flex flex-col items-center justify-center p-1"
+                    title={codeName}
+                >
+                    <span className="text-[8px] font-bold text-amber-600 dark:text-amber-400 uppercase truncate w-full text-center">
+                        {codeName.slice(0, 4)}
+                    </span>
+                </div>
+            </div>
+        );
+    }
+
+    const iconUrl = techData.icon_path.startsWith('http')
+        ? techData.icon_path
+        : `${process.env.NEXT_PUBLIC_API_URL}${techData.icon_path}`;
+
+    const shouldInvertInDark = techData.color_variant === 'black';
+    const shouldInvertInLight = techData.color_variant === 'white';
+
+    return (
+        <div className="relative group">
+            <button
+                onClick={onRemove}
+                className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-600 z-10"
+                title="Remove"
+            >
+                <svg className="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <div 
+                className="w-10 h-10 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg flex flex-col items-center justify-center p-1 hover:border-gray-300 dark:hover:border-zinc-600 transition-colors"
+                title={techData.display_name || codeName}
+            >
+                <img
+                    src={iconUrl}
+                    alt={techData.display_name || codeName}
+                    className={`w-6 h-6 object-contain ${shouldInvertInDark ? 'dark:invert' : ''} ${shouldInvertInLight ? 'invert dark:invert-0' : ''}`}
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+            </div>
+        </div>
+    );
+}
 
 interface ProjectsEditorProps {
     data: ProjectItem[] | null;
@@ -14,27 +108,64 @@ export function ProjectsEditor({ data, onChange }: ProjectsEditorProps) {
     // Local state to preserve cursor position in textareas
     const [keyFeaturesText, setKeyFeaturesText] = React.useState<string[]>([]);
     const [technicalChallengesText, setTechnicalChallengesText] = React.useState<string[]>([]);
+    
+    // Modal state for tech selection - tracks which project's modal is open
+    const [techModalOpenIndex, setTechModalOpenIndex] = useState<number | null>(null);
 
     // Initialize text state from array data
     useEffect(() => {
         setKeyFeaturesText(projects.map(p => (p.key_features || []).join('\n')));
         setTechnicalChallengesText(projects.map(p => (p.technical_challenges || []).join('\n')));
     }, [projects.length]); // Only re-init when projects array length changes
-
+    
+    // Handle adding a technology to a specific project
+    const handleAddTech = async (projectIndex: number, badge: TechBadgeData) => {
+        try {
+            let codeName = badge.code_name;
+            if (!codeName) {
+                const response = await apiRequest<any>(`/api/profile/tech/search/?q=${encodeURIComponent(badge.name)}`);
+                codeName = response?.code_name || badge.name.toLowerCase().replace(/\s+/g, '-');
+            }
+            
+            const currentTechs = projects[projectIndex].technologies || [];
+            if (codeName && !currentTechs.includes(codeName)) {
+                const newProj = [...projects];
+                newProj[projectIndex] = { ...newProj[projectIndex], technologies: [...currentTechs, codeName] };
+                onChange(newProj);
+            }
+        } catch (error) {
+            console.error('Failed to add tech:', error);
+            const codeName = badge.name.toLowerCase().replace(/\s+/g, '-');
+            const currentTechs = projects[projectIndex].technologies || [];
+            if (!currentTechs.includes(codeName)) {
+                const newProj = [...projects];
+                newProj[projectIndex] = { ...newProj[projectIndex], technologies: [...currentTechs, codeName] };
+                onChange(newProj);
+            }
+        }
+    };
+    
+    // Handle removing a technology from a specific project
+    const handleRemoveTech = (projectIndex: number, techCodeName: string) => {
+        const newProj = [...projects];
+        const currentTechs = projects[projectIndex].technologies || [];
+        newProj[projectIndex] = { ...newProj[projectIndex], technologies: currentTechs.filter(t => t !== techCodeName) };
+        onChange(newProj);
+    };
 
     return (
         <div className="space-y-6">
             {projects.map((proj, i) => (
-                <div key={i} className="p-5 bg-white rounded-xl border border-gray-200 shadow-sm relative group animate-in slide-in-from-bottom-2 duration-300">
+                <div key={i} className="p-5 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-700 shadow-sm relative group animate-in slide-in-from-bottom-2 duration-300">
                     <button
                         onClick={() => onChange(projects.filter((_, idx) => idx !== i))}
-                        className="absolute top-4 right-4 text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-full transition-all"
+                        className="absolute top-4 right-4 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 p-2 rounded-full transition-all"
                         title="Remove Project"
                     >
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                     <div className="mb-4 pr-10">
-                        <label className="text-xs text-gray-500 font-bold uppercase tracking-wide block mb-1.5">Project Title</label>
+                        <label className="text-xs text-gray-500 dark:text-zinc-400 font-bold uppercase tracking-wide block mb-1.5">Project Title</label>
                         <input
                             type="text" value={proj.title || ''}
                             onChange={e => {
@@ -42,12 +173,12 @@ export function ProjectsEditor({ data, onChange }: ProjectsEditorProps) {
                                 newProj[i] = { ...newProj[i], title: e.target.value };
                                 onChange(newProj);
                             }}
-                            className="w-full text-base font-semibold px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition-all"
+                            className="w-full text-base font-semibold px-3 py-2.5 border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 rounded-lg focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-400 dark:focus:border-indigo-500 outline-none transition-all"
                             placeholder="e.g. My Portfolio Website"
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="text-xs text-gray-500 font-bold uppercase tracking-wide block mb-1.5">Description</label>
+                        <label className="text-xs text-gray-500 dark:text-zinc-400 font-bold uppercase tracking-wide block mb-1.5">Description</label>
                         <AutoResizeTextarea
                             value={proj.description || ''}
                             onChange={e => {
@@ -55,34 +186,56 @@ export function ProjectsEditor({ data, onChange }: ProjectsEditorProps) {
                                 newProj[i] = { ...newProj[i], description: e.target.value };
                                 onChange(newProj);
                             }}
-                            className="w-full text-sm px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition-all"
+                            className="w-full text-sm px-3 py-2.5 border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 rounded-lg focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-400 dark:focus:border-indigo-500 outline-none transition-all"
                             placeholder="A brief overview of the project..."
                             rows={2}
                         />
                     </div>
+                    
+                    {/* Tech Stack - Modal-based selection like TechStackEditor */}
                     <div className="mb-4">
-                        <label className="text-xs text-gray-500 font-bold uppercase tracking-wide block mb-1.5">Tech Stack</label>
-                        <StringArrayInput
-                            value={proj.technologies}
-                            onChange={(newTechs) => {
-                                const newProj = [...projects];
-                                newProj[i] = { ...newProj[i], technologies: newTechs };
-                                onChange(newProj);
-                            }}
-                            className="w-full text-sm px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition-all"
-                            placeholder="React, Node.js, Python..."
-                        />
-                        <div className="flex flex-wrap gap-1.5 mt-2">
-                            {proj.technologies?.map(s => s.trim()).filter(Boolean).map((tech, idx) => (
-                                <span key={idx} className="text-[11px] px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full font-medium">{tech}</span>
-                            ))}
+                        <div className="flex items-center justify-between mb-2">
+                            <label className="text-xs text-gray-500 dark:text-zinc-400 font-bold uppercase tracking-wide">Tech Stack</label>
+                            <button
+                                onClick={() => setTechModalOpenIndex(i)}
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg font-medium text-xs hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors"
+                            >
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                </svg>
+                                Add Tech
+                            </button>
                         </div>
+                        
+                        {/* Tech Icons Grid */}
+                        {proj.technologies && proj.technologies.filter(t => t.trim()).length > 0 ? (
+                            <div className="flex flex-wrap gap-2 p-3 bg-gray-50 dark:bg-zinc-800/50 rounded-lg border border-gray-100 dark:border-zinc-700">
+                                {proj.technologies.map(s => s.trim()).filter(Boolean).map((tech, idx) => (
+                                    <MiniTechItem 
+                                        key={idx} 
+                                        codeName={tech} 
+                                        onRemove={() => handleRemoveTech(i, tech)}
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="border-2 border-dashed border-gray-200 dark:border-zinc-700 rounded-lg p-4 text-center">
+                                <p className="text-xs text-gray-400 dark:text-zinc-500">No technologies added. Click "Add Tech" to select.</p>
+                            </div>
+                        )}
+                        
+                        {/* Tech Badge Modal for this project */}
+                        <TechBadgeModal
+                            isOpen={techModalOpenIndex === i}
+                            onClose={() => setTechModalOpenIndex(null)}
+                            onSelect={(badge) => handleAddTech(i, badge)}
+                        />
                     </div>
 
                     {/* Key Features */}
                     <div className="mb-4">
-                        <label className="text-xs text-gray-500 font-bold uppercase tracking-wide block mb-1.5">
-                            Key Features <span className="text-gray-400 font-normal normal-case ml-1">(Optional - Each new line will be a bullet point)</span>
+                        <label className="text-xs text-gray-500 dark:text-zinc-400 font-bold uppercase tracking-wide block mb-1.5">
+                            Key Features <span className="text-gray-400 dark:text-zinc-500 font-normal normal-case ml-1">(Optional - Each new line will be a bullet point)</span>
                         </label>
                         <AutoResizeTextarea
                             value={keyFeaturesText[i] || ''}
@@ -98,7 +251,7 @@ export function ProjectsEditor({ data, onChange }: ProjectsEditorProps) {
                                 newProj[i] = { ...newProj[i], key_features: lines };
                                 onChange(newProj);
                             }}
-                            className="w-full text-sm px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition-all leading-relaxed"
+                            className="w-full text-sm px-3 py-2.5 border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 rounded-lg focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-400 dark:focus:border-indigo-500 outline-none transition-all leading-relaxed"
                             placeholder="Real-time data processing&#10;User authentication&#10;Responsive design"
                             rows={3}
                         />
@@ -106,8 +259,8 @@ export function ProjectsEditor({ data, onChange }: ProjectsEditorProps) {
 
                     {/* Technical Challenges */}
                     <div className="mb-4">
-                        <label className="text-xs text-gray-500 font-bold uppercase tracking-wide block mb-1.5">
-                            Technical Challenges <span className="text-gray-400 font-normal normal-case ml-1">(Optional - Each new line will be a bullet point)</span>
+                        <label className="text-xs text-gray-500 dark:text-zinc-400 font-bold uppercase tracking-wide block mb-1.5">
+                            Technical Challenges <span className="text-gray-400 dark:text-zinc-500 font-normal normal-case ml-1">(Optional - Each new line will be a bullet point)</span>
                         </label>
                         <AutoResizeTextarea
                             value={technicalChallengesText[i] || ''}
@@ -123,7 +276,7 @@ export function ProjectsEditor({ data, onChange }: ProjectsEditorProps) {
                                 newProj[i] = { ...newProj[i], technical_challenges: lines };
                                 onChange(newProj);
                             }}
-                            className="w-full text-sm px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition-all leading-relaxed"
+                            className="w-full text-sm px-3 py-2.5 border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 rounded-lg focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-400 dark:focus:border-indigo-500 outline-none transition-all leading-relaxed"
                             placeholder="Optimizing performance&#10;Scaling infrastructure&#10;Managing state complexity"
                             rows={3}
                         />

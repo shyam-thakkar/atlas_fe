@@ -5,6 +5,10 @@ export interface UserResponse {
   name?: string;
   id?: number | string;
   profile_image?: string;
+  resume_process_count?: number;
+  user_tier?: 'beta' | 'free' | 'pro' | 'enterprise';
+  authentication_method?: string;
+  tier?: 'beta' | 'free' | 'pro' | 'enterprise'; // Deprecated in favor of user_tier
 }
 
 export interface AuthResponse {

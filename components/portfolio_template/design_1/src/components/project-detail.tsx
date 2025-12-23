@@ -4,6 +4,7 @@ import { memo, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { X, ExternalLink, Github, Calendar, Users } from "lucide-react";
 import { TechStack, TechItem } from "./tech-stack";
+import { TechStackIcon } from "./tech-stack-icon";
 
 export interface ProjectDetailData {
   title: string;
@@ -13,6 +14,7 @@ export interface ProjectDetailData {
   images?: string[];
   tags: string[];
   techStack: TechItem[];
+  technologies?: string[]; // Array of tech code names (e.g., "react", "typescript")
   liveUrl?: string;
   githubUrl?: string;
   date?: string;
@@ -36,7 +38,7 @@ export const ProjectDetail = memo(function ProjectDetail({ project, onClose }: P
   useEffect(() => {
     document.addEventListener('keydown', handleEscape);
     document.body.style.overflow = 'hidden';
-    
+
     return () => {
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = 'unset';
@@ -44,7 +46,7 @@ export const ProjectDetail = memo(function ProjectDetail({ project, onClose }: P
   }, [handleEscape]);
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm"
       onClick={onClose}
       role="dialog"
@@ -52,7 +54,7 @@ export const ProjectDetail = memo(function ProjectDetail({ project, onClose }: P
       aria-labelledby="project-title"
     >
       <div className="min-h-screen px-4 py-8">
-        <div 
+        <div
           className="mx-auto max-w-4xl bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border-2 border-zinc-200 dark:border-zinc-800"
           onClick={(e) => e.stopPropagation()}
         >
@@ -186,7 +188,17 @@ export const ProjectDetail = memo(function ProjectDetail({ project, onClose }: P
               <h2 className="text-2xl font-bold text-black dark:text-white mb-4">
                 Technology Stack
               </h2>
-              <TechStack items={project.techStack} />
+              {project.techStack && project.techStack.length > 0 ? (
+                <TechStack items={project.techStack} />
+              ) : project.technologies && project.technologies.length > 0 ? (
+                <div className="flex flex-wrap gap-3">
+                  {project.technologies.map((tech, idx) => (
+                    <TechStackIcon key={idx} codeName={tech} />
+                  ))}
+                </div>
+              ) : (
+                <p className="text-zinc-500 dark:text-zinc-400 text-sm">No technologies specified.</p>
+              )}
             </section>
 
             {/* Additional Images Gallery */}

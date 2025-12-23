@@ -5,8 +5,10 @@ import { HeroEditor } from './editors/HeroEditor';
 import { SocialsEditor } from './editors/SocialsEditor';
 import { TechStackEditor } from './editors/TechStackEditor';
 import { ExperienceEditor } from './editors/ExperienceEditor';
+import { EducationEditor } from './editors/EducationEditor';
 import { ProjectsEditor } from './editors/ProjectsEditor';
 import { AboutEditor } from './editors/AboutEditor';
+import { ContactEditor } from './editors/ContactEditor';
 
 interface PortfolioManagerProps {
     onFinish?: () => void;
@@ -22,6 +24,8 @@ const STEPS = [
     { id: 'tech_stack', title: 'Tech Stack', description: 'The technologies and tools you excel at.' },
     { id: 'experience', title: 'Experience', description: 'Where have you worked? What did you accomplish?' },
     { id: 'projects', title: 'Projects', description: 'Showcase your best work and side projects.' },
+    { id: 'education', title: 'Education', description: 'Your academic background and qualifications.' },
+    { id: 'contact', title: 'Connect', description: 'Customize your contact section message.' },
 ];
 
 export function PortfolioManager({ onFinish, isModal = false, onDataChange, defaultEdit = false }: PortfolioManagerProps) {
@@ -193,11 +197,10 @@ export function PortfolioManager({ onFinish, isModal = false, onDataChange, defa
             {/* RIGHT: Content Area - Connected to selected tab */}
             <div className="flex-1 flex flex-col h-full bg-white dark:bg-zinc-950 relative min-w-0 rounded-r-2xl shadow-xl">
                 {/* Edit Hint Toast - appears on click when in review mode */}
-                <div className={`absolute top-4 right-4 z-20 transition-all duration-300 ease-out ${
-                    showEditHint 
-                        ? 'opacity-100 translate-y-0' 
-                        : 'opacity-0 -translate-y-2 pointer-events-none'
-                }`}>
+                <div className={`absolute top-4 right-4 z-20 transition-all duration-300 ease-out ${showEditHint
+                    ? 'opacity-100 translate-y-0'
+                    : 'opacity-0 -translate-y-2 pointer-events-none'
+                    }`}>
                     <div className="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 px-4 py-3 rounded-xl shadow-xl flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-violet-500/20 dark:bg-violet-500/30 flex items-center justify-center flex-shrink-0">
                             <svg className="w-4 h-4 text-violet-400 dark:text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -208,7 +211,7 @@ export function PortfolioManager({ onFinish, isModal = false, onDataChange, defa
                     </div>
                 </div>
                 {/* Editor Content Area */}
-                <div 
+                <div
                     className="flex-1 overflow-y-auto p-6"
                     onClick={handleContentClick}
                 >
@@ -263,6 +266,12 @@ export function PortfolioManager({ onFinish, isModal = false, onDataChange, defa
                             )}
                             {currentStepConfig.id === 'projects' && (
                                 <ProjectsEditor data={editedData.projects} onChange={(d) => handleUpdate('projects', d)} />
+                            )}
+                            {currentStepConfig.id === 'education' && (
+                                <EducationEditor data={editedData.education} onChange={(d) => handleUpdate('education', d)} />
+                            )}
+                            {currentStepConfig.id === 'contact' && (
+                                <ContactEditor data={editedData.contact} onChange={(d) => handleUpdate('contact', d)} />
                             )}
                         </div>
                     ) : null}

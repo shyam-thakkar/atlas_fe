@@ -1,17 +1,23 @@
 "use client";
 
 import { DynamicSocialIcon } from "./dynamic-social-icon";
+import { ContactSection as ContactSectionType } from "../../../../../types/portfolio";
 
 interface ContactSectionProps {
   socials?: Record<string, string | undefined>;
-  contactMessage?: string;
+  contact?: ContactSectionType | null;
 }
 
-export function ContactSection({ socials, contactMessage }: ContactSectionProps) {
-  // Default message if none provided
-  const defaultMessage = "I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision. Feel free to reach out through any of the social links above!";
+const DEFAULT_MESSAGE = "I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision. Feel free to reach out through any of the social links!";
+
+export function ContactSection({ socials, contact }: ContactSectionProps) {
+  // If contact is null or empty object, don't render the section
+  if (!contact || Object.keys(contact).length === 0) {
+    return null;
+  }
   
-  const message = contactMessage || defaultMessage;
+  // Use actual message if provided, otherwise show default
+  const message = contact.message || DEFAULT_MESSAGE;
   
   return (
     <section className="py-8 border-t-2 border-zinc-200 dark:border-zinc-800 mt-8">
@@ -51,6 +57,18 @@ export function ContactSection({ socials, contactMessage }: ContactSectionProps)
                   />
                 );
               })}
+            </div>
+          )}
+
+          {/* CTA Button if provided */}
+          {contact.cta_text && (
+            <div className="pt-2">
+              <a
+                href={socials?.email ? `mailto:${socials.email.replace('mailto:', '')}` : '#'}
+                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:from-violet-500 hover:to-indigo-500 transition-all duration-300"
+              >
+                {contact.cta_text}
+              </a>
             </div>
           )}
         </div>

@@ -132,7 +132,7 @@ export default function ProfileDetailsPage() {
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                                             </svg>
                                         </div>
-                                        Email / Password
+                                        <span className="capitalize">{user?.authentication_method || 'Email / Password'}</span>
                                     </dd>
                                 </div>
                                 <div className="p-4 bg-gray-50 dark:bg-zinc-800/30 rounded-xl">
@@ -143,7 +143,29 @@ export default function ProfileDetailsPage() {
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                             </svg>
                                         </div>
-                                        Free Tier
+                                        <span className="capitalize">{(user?.user_tier || user?.tier || 'Beta')} Tier</span>
+                                    </dd>
+                                </div>
+                                <div className="p-4 bg-gray-50 dark:bg-zinc-800/30 rounded-xl">
+                                    <dt className="text-xs font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider">Resume Processed</dt>
+                                    <dd className="mt-2 text-sm text-gray-900 dark:text-white flex items-center gap-2">
+                                        <div className="p-1.5 bg-violet-100 dark:bg-violet-500/10 rounded-lg">
+                                            <svg className="w-4 h-4 text-violet-600 dark:text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                        </div>
+                                        {(() => {
+                                            const tier = user?.user_tier || user?.tier;
+                                            const limit = tier === 'enterprise' ? Infinity :
+                                                tier === 'pro' ? 50 :
+                                                    tier === 'free' ? 3 : 5; // Default Beta
+                                            const usage = user?.resume_process_count || 0;
+                                            return (
+                                                <span>
+                                                    {usage} <span className="text-gray-400 dark:text-zinc-500">/ {limit === Infinity ? '∞' : limit}</span> Used
+                                                </span>
+                                            );
+                                        })()}
                                     </dd>
                                 </div>
                             </dl>

@@ -25,6 +25,17 @@ export interface ExperienceItem {
     logo_url?: string | null;
 }
 
+export interface EducationItem {
+    institution: string;
+    degree: string;
+    field_of_study: string;
+    grade?: string;
+    grade_type?: 'cgpa' | 'sgpa' | 'percentage' | 'gpa' | string;
+    start_date: string;
+    end_date: string;
+    description?: string;
+}
+
 export interface ProjectItem {
     title: string;
     description: string;
@@ -43,13 +54,20 @@ export interface AboutSection {
     hobbies?: string[];
 }
 
+export interface ContactSection {
+    message?: string;
+    cta_text?: string;
+}
+
 export interface StructuredPortfolio {
     hero: HeroSection;
     socials: SocialLinks;
     tech_stack: string[];
     experience: ExperienceItem[];
+    education: EducationItem[];
     projects: ProjectItem[];
     about: AboutSection;
+    contact?: ContactSection;
 }
 
 export type PipelineStatusEnum =

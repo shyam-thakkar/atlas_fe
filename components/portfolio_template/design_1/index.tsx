@@ -8,11 +8,28 @@ import { ProjectDetail, ProjectDetailData } from "./src/components/project-detai
 import { Experience } from "./src/components/experience";
 import { TypingAnimation } from "./src/components/typing-animation";
 import { ContactSection } from "./src/components/contact-section";
-import { EDUCATION_DATA } from "./src/constants/education-data";
 import { StructuredPortfolio } from "../../../types/portfolio";
 import { SmartTechBadge } from "./src/components/smart-tech-badge";
 import { TechStackIcon } from "./src/components/tech-stack-icon";
 import { DynamicSocialIcon } from "./src/components/dynamic-social-icon";
+
+// Base API URL for media files
+const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+// Helper to construct proper media URL
+function getMediaUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  // If already absolute URL, return as-is
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  // If relative URL starting with /, prepend API base
+  if (url.startsWith('/')) {
+    return `${BASE_API_URL}${url}`;
+  }
+  // Otherwise prepend with / and API base
+  return `${BASE_API_URL}/${url}`;
+}
 
 interface PortfolioDesign1Props {
   data: StructuredPortfolio | null;
@@ -48,7 +65,7 @@ export function PortfolioDesign1({ data, fullWidth = false }: PortfolioDesign1Pr
       title: data.hero.headline || "Your Title",
       greeting: "Hey! I'm " + (data.hero.full_name || "User"),
       typingText: data.hero.headline || "Developer",
-      profileImage: data.hero.profile_image || "/profile.png",
+      profileImage: getMediaUrl(data.hero.profile_image) || "/profile.png",
       description: data.about.long_bio || "No bio available.",
     };
   }, [data]);
@@ -62,9 +79,10 @@ export function PortfolioDesign1({ data, fullWidth = false }: PortfolioDesign1Pr
       title: proj.title,
       description: proj.description,
       longDescription: proj.description,
-      image: proj.thumbnail_url || '/project-placeholder.png',
+      image: getMediaUrl(proj.thumbnail_url) || '/project-placeholder.png',
       tags: proj.technologies || [],
-      techStack: [], // TODO: map technologies to TechItem[]
+      techStack: [], // Using technologies array instead
+      technologies: proj.technologies || [], // Pass tech code names for icon rendering
       liveUrl: proj.live_url,
       githubUrl: proj.repo_url,
       features: proj.key_features || [],
@@ -240,9 +258,9 @@ export function PortfolioDesign1({ data, fullWidth = false }: PortfolioDesign1Pr
                       project={{
                         title: proj.title,
                         description: proj.description,
-                        image: proj.thumbnail_url || undefined,
+                        image: getMediaUrl(proj.thumbnail_url) || undefined,
                         tags: proj.technologies || [],
-                        techStack: [], // TODO: map technologies to icons
+                        technologies: proj.technologies || [], // Pass tech code names for icon rendering
                         liveUrl: proj.live_url || undefined,
                         githubUrl: proj.repo_url || undefined,
                         variant: "card"
@@ -258,33 +276,79 @@ export function PortfolioDesign1({ data, fullWidth = false }: PortfolioDesign1Pr
                 <h2 className="text-3xl font-bold text-black dark:text-white mb-6 transition-colors duration-300">
                   Education
                 </h2>
-                <div className="bg-white dark:bg-zinc-900 rounded-xl border-2 border-zinc-200 dark:border-zinc-800 p-6 shadow-sm transition-colors duration-300">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
-                    <div>
-                      <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 transition-colors duration-300">
-                        {EDUCATION_DATA.institution}
-                      </h3>
-                      <p className="text-zinc-600 dark:text-zinc-400 transition-colors duration-300">
-                        {EDUCATION_DATA.degree}
-                      </p>
-                    </div>
-                    <div className="text-right mt-2 md:mt-0">
-                      <span className="block text-sm font-semibold text-zinc-900 dark:text-zinc-100 transition-colors duration-300">
-                        CGPA: {EDUCATION_DATA.cgpa}
-                      </span>
-                      <span className="block text-sm text-zinc-500 dark:text-zinc-500 transition-colors duration-300">
-                        {EDUCATION_DATA.duration}
-                      </span>
-                    </div>
+                {data.education && data.education.length > 0 ? (
+                  <div className="space-y-4">
+                    {data.education.map((edu, index) => {
+                      // Format dates nicely - handles ISO dates, year-only, and Present
+                      const formatDate = (dateStr: string) => {
+                        if (!dateStr) return '';
+                        if (dateStr === 'Present') return 'Present';
+                        
+                        // Check if it's year-only (just 4 digits)
+                        const yearOnlyMatch = dateStr.match(/^(\d{4})$/);
+                        if (yearOnlyMatch) {
+                          return yearOnlyMatch[1];
+                        }
+                        
+                        // Try ISO date format
+                        const date = new Date(dateStr);
+                        if (!isNaN(date.getTime())) {
+                          return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                        }
+                        return dateStr;
+                      };
+
+                      // Format grade type label
+                      const getGradeLabel = (type?: string) => {
+                        switch (type?.toLowerCase()) {
+                          case 'cgpa': return 'CGPA';
+                          case 'sgpa': return 'SGPA';
+                          case 'gpa': return 'GPA';
+                          case 'percentage': return 'Percentage';
+                          default: return 'Grade';
+                        }
+                      };
+
+                      return (
+                        <div key={index} className="bg-white dark:bg-zinc-900 rounded-xl border-2 border-zinc-200 dark:border-zinc-800 p-6 shadow-sm transition-colors duration-300">
+                          <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 transition-colors duration-300">
+                                {edu.institution}
+                              </h3>
+                              <p className="text-zinc-600 dark:text-zinc-400 transition-colors duration-300 mt-1">
+                                {edu.degree}
+                                {edu.field_of_study && <span className="text-zinc-500 dark:text-zinc-500"> in {edu.field_of_study}</span>}
+                              </p>
+                              {edu.description && (
+                                <p className="text-sm text-zinc-500 dark:text-zinc-500 mt-2">
+                                  {edu.description}
+                                </p>
+                              )}
+                            </div>
+                            <div className="text-left md:text-right flex-shrink-0">
+                              {edu.grade && (
+                                <span className="block text-sm font-semibold text-zinc-900 dark:text-zinc-100 transition-colors duration-300">
+                                  {getGradeLabel(edu.grade_type)}: {edu.grade}
+                                  {edu.grade_type === 'percentage' && '%'}
+                                </span>
+                              )}
+                              <span className="block text-sm text-zinc-500 dark:text-zinc-500 transition-colors duration-300">
+                                {formatDate(edu.start_date)} - {formatDate(edu.end_date)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                  <div className="text-zinc-600 dark:text-zinc-400 text-sm transition-colors duration-300">
-                    {EDUCATION_DATA.location}
-                  </div>
-                </div>
+                ) : (
+                  <p className="text-zinc-500 dark:text-zinc-400 text-sm">No education added yet.</p>
+                )}
               </section>
 
               {/* Contact Section */}
-              <ContactSection socials={data.socials} />
+              <ContactSection socials={data.socials} contact={data.contact} />
             </>
           ) : (
             /* Model Card View */

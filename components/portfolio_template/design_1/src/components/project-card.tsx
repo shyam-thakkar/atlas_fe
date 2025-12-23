@@ -4,6 +4,7 @@ import { memo } from "react";
 import Image from "next/image";
 import { ExternalLink, Github } from "lucide-react";
 import { TechStack, TechItem } from "./tech-stack";
+import { TechStackIcon } from "./tech-stack-icon";
 
 export interface ProjectData {
     title: string;
@@ -11,6 +12,7 @@ export interface ProjectData {
     image?: string;
     tags: string[];
     techStack?: TechItem[];
+    technologies?: string[]; // Array of tech code names (e.g., "react", "typescript")
     liveUrl?: string;
     githubUrl?: string;
     variant?: "card" | "minimal" | "featured";
@@ -83,12 +85,26 @@ export const ProjectCard = memo(function ProjectCard({ project, onClick }: Proje
                         {project.description}
                     </p>
 
+                    {/* Tech Stack - supports both TechItem[] and technologies string[] */}
                     {project.techStack && project.techStack.length > 0 ? (
                         <div className="mb-4 min-h-16">
                             <TechStack items={project.techStack.slice(0, 6)} maxCols={8} />
                         </div>
+                    ) : project.technologies && project.technologies.length > 0 ? (
+                        <div className="mb-4 min-h-12 flex flex-wrap gap-2 items-center">
+                            {project.technologies.slice(0, 6).map((tech, idx) => (
+                                <div key={idx} className="scale-75 origin-left">
+                                    <TechStackIcon codeName={tech} />
+                                </div>
+                            ))}
+                            {project.technologies.length > 6 && (
+                                <span className="text-xs text-zinc-500 dark:text-zinc-400 ml-1">
+                                    +{project.technologies.length - 6} more
+                                </span>
+                            )}
+                        </div>
                     ) : (
-                        <div className="mb-4 min-h-16" />
+                        <div className="mb-4 min-h-12" />
                     )}
 
                     <div className="flex gap-3 mt-auto">

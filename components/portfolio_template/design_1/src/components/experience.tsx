@@ -4,6 +4,17 @@ import { useMemo } from "react";
 import { Calendar, Briefcase, Building2 } from "lucide-react";
 import { ExperienceItem } from "../../../../../types/portfolio";
 
+// Base API URL for media files
+const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+// Helper to construct proper media URL
+function getMediaUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (url.startsWith('/')) return `${BASE_API_URL}${url}`;
+  return `${BASE_API_URL}/${url}`;
+}
+
 // Constants
 const TIMELINE_STYLES = {
   dot: "absolute -left-[9px] top-6 w-4 h-4 rounded-full bg-white dark:bg-zinc-950 border-4 border-zinc-400 dark:border-zinc-600",
@@ -44,12 +55,12 @@ export function Experience({ data }: ExperienceProps) {
           // Convert summary to bullet points
           const descriptionPoints = job.description
             ? job.description
-                .split('\n')
-                .map(line => line.trim())
-                .filter(line => line.length > 0)
-                .map(line => line.replace(/^[-•*]\s*/, '')) // Remove existing bullets if user typed them
+              .split('\n')
+              .map(line => line.trim())
+              .filter(line => line.length > 0)
+              .map(line => line.replace(/^[-•*]\s*/, '')) // Remove existing bullets if user typed them
             : [];
-          
+
           return (
             <article key={`${job.company_name}-${index}`} className="relative pl-8 md:pl-12">
               {/* Timeline dot */}
@@ -59,30 +70,30 @@ export function Experience({ data }: ExperienceProps) {
                 <div className="flex items-center gap-4">
                   {/* Logo Placeholder - Now supports user uploaded/linked logo */}
                   <div className="flex-shrink-0 flex items-center justify-center w-[60px] h-[60px] bg-zinc-100 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden relative">
-                     {job.logo_url ? (
-                        <>
-                           <img 
-                             src={job.logo_url} 
-                             alt={`${job.company_name} logo`} 
-                             className="w-full h-full object-contain p-1 relative z-10"
-                             onError={(e) => {
-                                 e.currentTarget.style.display = 'none';
-                                 // Show fallback by affecting sibling? 
-                                 // Easier: Just have fallback absolutely positioned behind it, or standard behavior.
-                                 // If img hides, the background is visible.
-                                 // Let's use the 'hidden' class toggle or just have fallback always there if transparent?
-                                 // No, if logo is transparent png, we see fallback behind.
-                                 const fallback = e.currentTarget.nextElementSibling;
-                                 if (fallback) fallback.classList.remove('hidden');
-                             }}
-                           />
-                           <div className="hidden absolute inset-0 flex items-center justify-center fallback-icon">
-                              <Building2 className="w-8 h-8 text-zinc-400" />
-                           </div>
-                        </>
-                     ) : (
-                        <Building2 className="w-8 h-8 text-zinc-400" />
-                     )}
+                    {job.logo_url ? (
+                      <>
+                        <img
+                          src={getMediaUrl(job.logo_url) || ''}
+                          alt={`${job.company_name} logo`}
+                          className="w-full h-full object-contain p-1 relative z-10"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            // Show fallback by affecting sibling? 
+                            // Easier: Just have fallback absolutely positioned behind it, or standard behavior.
+                            // If img hides, the background is visible.
+                            // Let's use the 'hidden' class toggle or just have fallback always there if transparent?
+                            // No, if logo is transparent png, we see fallback behind.
+                            const fallback = e.currentTarget.nextElementSibling;
+                            if (fallback) fallback.classList.remove('hidden');
+                          }}
+                        />
+                        <div className="hidden absolute inset-0 flex items-center justify-center fallback-icon">
+                          <Building2 className="w-8 h-8 text-zinc-400" />
+                        </div>
+                      </>
+                    ) : (
+                      <Building2 className="w-8 h-8 text-zinc-400" />
+                    )}
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 leading-tight">
@@ -97,16 +108,16 @@ export function Experience({ data }: ExperienceProps) {
                   <Calendar className="w-4 h-4" aria-hidden="true" />
                   <time>
                     {(() => {
-                        const formatDate = (d: string | null) => {
-                            if (!d || d === 'Present') return 'Present';
-                            const date = new Date(d);
-                            // Verify valid date and it looks like it was parsed meaningfully
-                            if (!isNaN(date.getTime())) {
-                                return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-                            }
-                            return d;
-                        };
-                        return `${formatDate(job.start_date)} - ${formatDate(job.end_date)}`;
+                      const formatDate = (d: string | null) => {
+                        if (!d || d === 'Present') return 'Present';
+                        const date = new Date(d);
+                        // Verify valid date and it looks like it was parsed meaningfully
+                        if (!isNaN(date.getTime())) {
+                          return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                        }
+                        return d;
+                      };
+                      return `${formatDate(job.start_date)} - ${formatDate(job.end_date)}`;
                     })()}
                   </time>
                 </div>
