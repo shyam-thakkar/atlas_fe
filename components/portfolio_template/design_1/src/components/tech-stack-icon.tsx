@@ -7,6 +7,7 @@ const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface TechStackIconProps {
   codeName: string;
+  clickable?: boolean; // When false, unregistered techs show as plain text (for project cards)
 }
 
 interface TechApiResponse {
@@ -17,7 +18,7 @@ interface TechApiResponse {
   color_variant: 'colored' | 'black' | 'white';
 }
 
-export function TechStackIcon({ codeName }: TechStackIconProps) {
+export function TechStackIcon({ codeName, clickable = true }: TechStackIconProps) {
   const [data, setData] = useState<TechApiResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -66,10 +67,30 @@ export function TechStackIcon({ codeName }: TechStackIconProps) {
     const isMissingIcon = !!(data && !data.icon_path);
     const displayName = data?.display_name || codeName;
 
+    // Non-clickable version for project cards - same style but as span
+    if (!clickable) {
+      return (
+        <span
+          className="group relative flex items-center justify-center w-auto h-10 px-3 gap-2 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200 dark:border-amber-900/50"
+          title={isMissingIcon ? `${displayName} (Icon Missing)` : `${displayName} (Not Found)`}
+        >
+          <svg className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span className="text-sm font-medium text-amber-700 dark:text-amber-400 whitespace-nowrap">
+            {displayName}
+          </span>
+        </span>
+      );
+    }
+
     return (
       <>
         <button
-          onClick={() => setShowModal(true)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowModal(true);
+          }}
           className="group relative flex items-center justify-center w-auto h-10 px-3 gap-2 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200 dark:border-amber-900/50 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-all hover:scale-105"
           title={isMissingIcon ? `${displayName} (Icon Missing)` : `${displayName} (Not Found)`}
         >

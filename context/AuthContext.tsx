@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     useEffect(() => {
-        const publicRoutes = ['/login', '/signup'];
+        const publicRoutes = ['/', '/login', '/signup'];
         const isPublicRoute = publicRoutes.includes(pathname);
 
         // Client-side route protection
@@ -70,10 +70,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             return;
         }
 
-        // If we are on public route and have token, maybe redirect to dashboard?
-        if (token && isPublicRoute) {
+        // If we are on login/signup and have token, redirect to dashboard
+        if (token && (pathname === '/login' || pathname === '/signup')) {
              router.push('/dashboard');
-             // We still fetch user to confirm valid token
+             return;
         }
 
         checkUser();

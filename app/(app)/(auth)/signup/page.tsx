@@ -8,6 +8,7 @@ import { AuthInput } from '@/components/AuthInput';
 import { AuthButton } from '@/components/AuthButton';
 import { AuthDivider } from '@/components/AuthDivider';
 import { GoogleButton } from '@/components/GoogleButton';
+import { LandingNavbar } from '@/components/LandingNavbar';
 import { useAuth } from '@/context/AuthContext';
 
 export default function SignupPage() {
@@ -48,11 +49,13 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-950 px-4 py-12 sm:px-6 lg:px-8">
-      <AuthCard
-        title="Create an account"
-        description="Enter your details to get started"
-      >
+    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-zinc-950">
+      <LandingNavbar />
+      <div className="flex-1 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+        <AuthCard
+          title="Create an account"
+          description="Enter your details to get started"
+        >
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <div className="p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-lg">
@@ -106,6 +109,7 @@ export default function SignupPage() {
           </p>
         </form>
       </AuthCard>
+      </div>
     </div>
   );
 }

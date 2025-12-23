@@ -56,7 +56,8 @@ export function SmartTechBadge({ codeName }: SmartTechBadgeProps) {
     };
   }, [codeName]);
 
-  const handleAddCustomTech = () => {
+  const handleAddCustomTech = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setShowModal(true);
   };
 

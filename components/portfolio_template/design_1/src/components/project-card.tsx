@@ -94,7 +94,7 @@ export const ProjectCard = memo(function ProjectCard({ project, onClick }: Proje
                         <div className="mb-4 min-h-12 flex flex-wrap gap-2 items-center">
                             {project.technologies.slice(0, 6).map((tech, idx) => (
                                 <div key={idx} className="scale-75 origin-left">
-                                    <TechStackIcon codeName={tech} />
+                                    <TechStackIcon codeName={tech} clickable={false} />
                                 </div>
                             ))}
                             {project.technologies.length > 6 && (

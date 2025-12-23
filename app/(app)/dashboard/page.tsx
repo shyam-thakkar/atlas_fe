@@ -14,20 +14,20 @@ export default function DashboardPage() {
                 <div className="relative overflow-hidden bg-white dark:bg-zinc-900/80 rounded-2xl border border-gray-200 dark:border-zinc-800/50 p-8 shadow-sm dark:shadow-2xl">
                     {/* Gradient accent in dark mode */}
                     <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-500/50 to-transparent opacity-0 dark:opacity-100" />
-                    
+
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                         Welcome back, <span className="text-violet-600 dark:text-violet-400">{user?.name || 'User'}</span>!
                     </h1>
                     <p className="mt-3 text-gray-600 dark:text-zinc-400 max-w-lg">
-                        This is your Atlas dashboard. Build your AI-powered portfolio by uploading your resume and customizing your profile.
+                        This is your AIFolio dashboard. Build your AI-powered portfolio by uploading your resume and customizing your profile.
                     </p>
                 </div>
 
                 {/* Quick Actions Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Resume Card */}
-                    <Link 
-                        href="/dashboard/resume" 
+                    <Link
+                        href="/dashboard/resume"
                         className="group relative overflow-hidden p-6 bg-white dark:bg-zinc-900/60 border border-gray-200 dark:border-zinc-800/50 rounded-2xl hover:border-violet-500/50 dark:hover:border-violet-500/30 hover:shadow-lg dark:hover:shadow-violet-500/5 transition-all duration-300"
                     >
                         <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -51,8 +51,8 @@ export default function DashboardPage() {
                     </Link>
 
                     {/* Profile Card */}
-                    <Link 
-                        href="/dashboard/profile" 
+                    <Link
+                        href="/dashboard/profile"
                         className="group relative overflow-hidden p-6 bg-white dark:bg-zinc-900/60 border border-gray-200 dark:border-zinc-800/50 rounded-2xl hover:border-indigo-500/50 dark:hover:border-indigo-500/30 hover:shadow-lg dark:hover:shadow-indigo-500/5 transition-all duration-300"
                     >
                         <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -76,8 +76,8 @@ export default function DashboardPage() {
                     </Link>
 
                     {/* Portfolio Card */}
-                    <Link 
-                        href="/dashboard/portfolio" 
+                    <Link
+                        href="/dashboard/portfolio"
                         className="group relative overflow-hidden p-6 bg-white dark:bg-zinc-900/60 border border-gray-200 dark:border-zinc-800/50 rounded-2xl hover:border-purple-500/50 dark:hover:border-purple-500/30 hover:shadow-lg dark:hover:shadow-purple-500/5 transition-all duration-300"
                     >
                         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -101,8 +101,8 @@ export default function DashboardPage() {
                     </Link>
 
                     {/* Preview Card */}
-                    <Link 
-                        href="/dashboard/portfolio/preview" 
+                    <Link
+                        href="/dashboard/portfolio/preview"
                         className="group relative overflow-hidden p-6 bg-white dark:bg-zinc-900/60 border border-gray-200 dark:border-zinc-800/50 rounded-2xl hover:border-emerald-500/50 dark:hover:border-emerald-500/30 hover:shadow-lg dark:hover:shadow-emerald-500/5 transition-all duration-300"
                     >
                         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

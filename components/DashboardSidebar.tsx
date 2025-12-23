@@ -88,7 +88,7 @@ export function DashboardSidebar({ collapsed = false, onToggle }: DashboardSideb
             </button>
           )}
           <span className={`text-sm font-semibold text-zinc-800 dark:text-zinc-200 tracking-tight overflow-hidden whitespace-nowrap transition-all duration-300 ${collapsed ? 'w-0 opacity-0' : 'opacity-100'}`}>
-            Atlas
+            AIFolio
           </span>
         </div>
 

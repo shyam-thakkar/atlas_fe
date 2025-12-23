@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Atlas - Authentication",
-  description: "Secure and modern authentication for Atlas",
+  title: "AIFolio - AI Portfolio Builder",
+  description: "Transform your resume into a stunning portfolio with AI",
 };
 
 import { AuthProvider } from "@/context/AuthContext";
@@ -36,10 +36,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-          >
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+        >
           <AuthProvider>
             {children}
           </AuthProvider>

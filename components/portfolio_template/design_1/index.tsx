@@ -23,6 +23,14 @@ function getMediaUrl(url: string | null | undefined): string | null {
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return url;
   }
+  // If it looks like a static asset in /public (e.g., /alex-johnson-pfp.png), return as-is
+  // These are served directly by Next.js without needing the API base URL
+  if (url.startsWith('/') && (url.includes('.png') || url.includes('.jpg') || url.includes('.jpeg') || url.includes('.webp') || url.includes('.svg') || url.includes('.gif'))) {
+    // Check if it's a media path from API (contains /media/) or a local static asset
+    if (!url.includes('/media/')) {
+      return url; // Local static asset, return as-is
+    }
+  }
   // If relative URL starting with /, prepend API base
   if (url.startsWith('/')) {
     return `${BASE_API_URL}${url}`;
@@ -79,7 +87,7 @@ export function PortfolioDesign1({ data, fullWidth = false }: PortfolioDesign1Pr
       title: proj.title,
       description: proj.description,
       longDescription: proj.description,
-      image: getMediaUrl(proj.thumbnail_url) || '/project-placeholder.png',
+      image: getMediaUrl(proj.thumbnail_url) || undefined,
       tags: proj.technologies || [],
       techStack: [], // Using technologies array instead
       technologies: proj.technologies || [], // Pass tech code names for icon rendering
