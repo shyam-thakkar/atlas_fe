@@ -10,7 +10,7 @@ interface PublishModalProps {
     onSuccess?: () => void;
 }
 
-type ModalState = 'loading' | 'first-publish' | 'republish' | 'publishing' | 'success' | 'error';
+type ModalState = 'loading' | 'first-publish' | 'republish' | 'publishing' | 'success' | 'error' | 'confirm-unpublish';
 
 export function PublishModal({ isOpen, onClose, onSuccess }: PublishModalProps) {
     const [state, setState] = useState<ModalState>('loading');
@@ -121,10 +121,10 @@ export function PublishModal({ isOpen, onClose, onSuccess }: PublishModalProps) 
     };
 
     const handleUnpublish = async () => {
-        if (!confirm('Are you sure you want to unpublish your portfolio? Your username will be reserved.')) {
-            return;
-        }
+        setState('confirm-unpublish');
+    };
 
+    const confirmUnpublish = async () => {
         setState('publishing');
         try {
             await publish.unpublishPortfolio();
@@ -393,6 +393,38 @@ export function PublishModal({ isOpen, onClose, onSuccess }: PublishModalProps) 
                                 </svg>
                                 View Live Portfolio
                             </button>
+                        </div>
+                    )}
+
+                    {/* Confirm Unpublish State */}
+                    {state === 'confirm-unpublish' && (
+                        <div className="space-y-5">
+                            <div className="flex flex-col items-center py-4">
+                                <div className="w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center mb-4">
+                                    <svg className="w-8 h-8 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Unpublish Portfolio?</h3>
+                                <p className="text-sm text-gray-500 dark:text-zinc-400 mt-2 text-center">
+                                    Your portfolio will no longer be visible to the public. Your username will be reserved for future use.
+                                </p>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setState('republish')}
+                                    className="flex-1 py-3 px-4 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={confirmUnpublish}
+                                    className="flex-1 py-3 px-4 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium shadow-lg shadow-red-500/25 transition-all"
+                                >
+                                    Yes, Unpublish
+                                </button>
+                            </div>
                         </div>
                     )}
 

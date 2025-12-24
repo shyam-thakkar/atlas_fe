@@ -233,7 +233,10 @@ export function DashboardSidebar({ collapsed = false, onToggle }: DashboardSideb
       {/* Publish Modal */}
       <PublishModal
         isOpen={isPublishModalOpen}
-        onClose={() => setIsPublishModalOpen(false)}
+        onClose={() => {
+          setIsPublishModalOpen(false);
+          loadPublishStatus(); // Refresh status on close (catches unpublish too)
+        }}
         onSuccess={() => {
           loadPublishStatus(); // Refresh status after publish
         }}

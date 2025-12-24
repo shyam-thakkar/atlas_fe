@@ -7,6 +7,7 @@ export const googleAuth = {
             throw new Error('NEXT_PUBLIC_API_URL is not defined');
         }
         // Full page redirect - NO CORS issues
-        window.location.href = `${backendUrl}/api/auth/google/`;
+        // prompt=select_account forces Google to show account picker every time
+        window.location.href = `${backendUrl}/api/auth/google/?prompt=select_account`;
     }
 };
