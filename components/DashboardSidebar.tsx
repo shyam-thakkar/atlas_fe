@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from 'next-themes';
+import { publish } from '@/lib/publish';
+import { PublishModal } from './portfolio/PublishModal';
 
 interface DashboardSidebarProps {
   collapsed?: boolean;
@@ -16,10 +18,23 @@ export function DashboardSidebar({ collapsed = false, onToggle }: DashboardSideb
   const { logout, user } = useAuth();
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isPublished, setIsPublished] = useState<boolean | null>(null);
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    loadPublishStatus();
   }, []);
+
+  const loadPublishStatus = async () => {
+    try {
+      const status = await publish.getPublishStatus();
+      setIsPublished(status.is_published);
+    } catch (err) {
+      // Silently fail - user might not have published yet
+      setIsPublished(false);
+    }
+  };
 
   const handleThemeToggle = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
@@ -142,6 +157,34 @@ export function DashboardSidebar({ collapsed = false, onToggle }: DashboardSideb
               </Link>
             );
           })}
+
+          {/* Publish Button - Special item with status indicator */}
+          <button
+            onClick={() => setIsPublishModalOpen(true)}
+            className={`
+              relative w-full flex items-center h-10 gap-3 px-2 text-sm rounded-lg transition-all duration-300
+              ${isPublished
+                ? 'bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-500/20'
+                : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-200'
+              }
+            `}
+            title={isPublished ? 'Published - Click to manage' : 'Publish your portfolio'}
+          >
+            {/* Icon wrapper */}
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-300 ${isPublished ? 'bg-green-200 dark:bg-green-500/20 text-green-700 dark:text-green-400' : 'text-zinc-500 dark:text-zinc-500'}`}>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            {/* Label */}
+            <span className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${collapsed ? 'w-0 opacity-0' : 'opacity-100'}`}>
+              {isPublished ? 'Published' : 'Publish'}
+            </span>
+            {/* Status dot */}
+            {isPublished && (
+              <span className={`absolute right-2 w-2 h-2 rounded-full bg-green-500 shadow-sm shadow-green-500/50 ${collapsed ? 'right-1' : ''}`} />
+            )}
+          </button>
         </nav>
       </div>
 
@@ -186,6 +229,15 @@ export function DashboardSidebar({ collapsed = false, onToggle }: DashboardSideb
           </span>
         </button>
       </div>
+
+      {/* Publish Modal */}
+      <PublishModal
+        isOpen={isPublishModalOpen}
+        onClose={() => setIsPublishModalOpen(false)}
+        onSuccess={() => {
+          loadPublishStatus(); // Refresh status after publish
+        }}
+      />
     </div>
   );
 }

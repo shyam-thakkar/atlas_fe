@@ -9,6 +9,8 @@ import { EducationEditor } from './editors/EducationEditor';
 import { ProjectsEditor } from './editors/ProjectsEditor';
 import { AboutEditor } from './editors/AboutEditor';
 import { ContactEditor } from './editors/ContactEditor';
+import { PublishModal } from './PublishModal';
+import { PublishButton } from './PublishStatusBadge';
 
 interface PortfolioManagerProps {
     onFinish?: () => void;
@@ -37,6 +39,7 @@ export function PortfolioManager({ onFinish, isModal = false, onDataChange, defa
     const [editedData, setEditedData] = useState<StructuredPortfolio | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [showEditHint, setShowEditHint] = useState(false);
+    const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
 
     // Handle click on content when not editing - show hint notification
     const handleContentClick = () => {
@@ -132,31 +135,38 @@ export function PortfolioManager({ onFinish, isModal = false, onDataChange, defa
             {/* LEFT: Diary-style Tabs with Actions */}
             <div className="w-52 flex-shrink-0 flex flex-col overflow-visible rounded-l-2xl bg-gray-200 dark:bg-zinc-800">
                 {/* Action Buttons at Top */}
-                <div className="p-3 border-b border-gray-300 dark:border-zinc-700 flex items-center gap-2 transition-all duration-300">
-                    {!isEditing ? (
-                        <button
-                            onClick={toggleEdit}
-                            className="w-full px-3 py-2 bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 border border-gray-300 dark:border-zinc-600 rounded-lg font-medium text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all shadow-sm"
-                        >
-                            Edit
-                        </button>
-                    ) : (
-                        <>
+                <div className="p-3 border-b border-gray-300 dark:border-zinc-700 flex flex-col gap-2 transition-all duration-300">
+                    <div className="flex items-center gap-2">
+                        {!isEditing ? (
                             <button
                                 onClick={toggleEdit}
-                                className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 border border-gray-300 dark:border-zinc-600 rounded-lg font-medium text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all shadow-sm"
+                                className="w-full px-3 py-2 bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 border border-gray-300 dark:border-zinc-600 rounded-lg font-medium text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all shadow-sm"
                             >
-                                Cancel
+                                Edit
                             </button>
-                            <button
-                                onClick={handleSave}
-                                disabled={isSaving}
-                                className="flex-1 px-3 py-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-lg font-medium text-sm shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {isSaving ? 'Saving...' : 'Save All'}
-                            </button>
-                        </>
-                    )}
+                        ) : (
+                            <>
+                                <button
+                                    onClick={toggleEdit}
+                                    className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 border border-gray-300 dark:border-zinc-600 rounded-lg font-medium text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all shadow-sm"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleSave}
+                                    disabled={isSaving}
+                                    className="flex-1 px-3 py-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-lg font-medium text-sm shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isSaving ? 'Saving...' : 'Save All'}
+                                </button>
+                            </>
+                        )}
+                    </div>
+                    {/* Publish Button */}
+                    <PublishButton 
+                        onClick={() => setIsPublishModalOpen(true)} 
+                        className="w-full justify-center"
+                    />
                 </div>
 
                 {/* Section Tabs - Diary Style */}
@@ -277,6 +287,15 @@ export function PortfolioManager({ onFinish, isModal = false, onDataChange, defa
                     ) : null}
                 </div>
             </div>
+
+            {/* Publish Modal */}
+            <PublishModal
+                isOpen={isPublishModalOpen}
+                onClose={() => setIsPublishModalOpen(false)}
+                onSuccess={() => {
+                    // Optionally refresh status or show notification
+                }}
+            />
         </div>
     );
 }

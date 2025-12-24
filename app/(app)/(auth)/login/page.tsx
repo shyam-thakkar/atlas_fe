@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { AuthCard } from '@/components/AuthCard';
 import { AuthInput } from '@/components/AuthInput';
 import { AuthButton } from '@/components/AuthButton';
@@ -11,8 +11,9 @@ import { GoogleButton } from '@/components/GoogleButton';
 import { LandingNavbar } from '@/components/LandingNavbar';
 import { useAuth } from '@/context/AuthContext';
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login, loginWithGoogle, isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
@@ -20,6 +21,14 @@ export default function LoginPage() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Check for OAuth error from query params
+  useEffect(() => {
+    const oauthError = searchParams.get('error');
+    if (oauthError === 'login_failed') {
+      setError('Login was cancelled or failed. Please try again.');
+    }
+  }, [searchParams]);
 
   // Redirect if already authenticated
   React.useEffect(() => {
@@ -100,5 +109,20 @@ export default function LoginPage() {
       </AuthCard>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-zinc-950">
+        <LandingNavbar />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="animate-pulse text-gray-500 dark:text-zinc-400">Loading...</div>
+        </div>
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }
