@@ -173,10 +173,10 @@ export function PortfolioDesign1({ data, fullWidth = false }: PortfolioDesign1Pr
             <>
               {/* Hero Section */}
               <section className="py-12">
-                <div className="flex gap-6 items-center mb-10">
+                <div className="flex flex-col sm:flex-row gap-6 items-center mb-10">
                   {/* Left: Profile Photo */}
                   <div className="flex-shrink-0">
-                    <div className="w-40 h-40 rounded-full overflow-hidden bg-transparent relative border-4 border-zinc-200 dark:border-zinc-800">
+                    <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden bg-transparent relative border-4 border-zinc-200 dark:border-zinc-800">
                       {personalInfo.profileImage && personalInfo.profileImage !== "/profile.png" ? (
                         <img
                           src={personalInfo.profileImage}
@@ -184,7 +184,7 @@ export function PortfolioDesign1({ data, fullWidth = false }: PortfolioDesign1Pr
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="absolute inset-0 flex items-center justify-center bg-indigo-100 text-indigo-500 font-bold text-5xl">
+                        <div className="absolute inset-0 flex items-center justify-center bg-indigo-100 text-indigo-500 font-bold text-4xl sm:text-5xl">
                           {personalInfo.name.charAt(0)}
                         </div>
                       )}
@@ -192,13 +192,13 @@ export function PortfolioDesign1({ data, fullWidth = false }: PortfolioDesign1Pr
                   </div>
 
                   {/* Right: Greeting and Typing Animation */}
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0 text-center sm:text-left">
                     {/* Greeting */}
-                    <h1 className="text-2xl md:text-3xl font-bold text-black dark:text-white transition-colors duration-300 mb-3 whitespace-nowrap">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-black dark:text-white transition-colors duration-300 mb-3 break-words">
                       {personalInfo.greeting}
                     </h1>
                     {/* Typing Animation */}
-                    <p className="text-xl md:text-2xl text-zinc-500 dark:text-zinc-400 font-light">
+                    <p className="text-lg sm:text-xl md:text-2xl text-zinc-500 dark:text-zinc-400 font-light">
                       <TypingAnimation text={personalInfo.typingText} speed={100} delay={500} />
                     </p>
                   </div>
