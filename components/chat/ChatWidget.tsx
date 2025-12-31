@@ -155,7 +155,7 @@ export function ChatWidget({ isPublic = false, username, title, profileImage }: 
         <>
             {/* Chat Button Container - At extreme right of portfolio content */}
             <div className="fixed bottom-6 left-0 right-0 z-50 pointer-events-none">
-                <div className="mx-auto w-[70%] md:w-[60%] pr-4 flex justify-end pointer-events-auto">
+                <div className="mx-auto w-full md:w-[60%] pr-4 flex justify-end pointer-events-auto">
                     {!isOpen && (
                         <ChatButton
                             onClick={() => setIsOpen(true)}
