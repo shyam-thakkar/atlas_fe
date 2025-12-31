@@ -11,6 +11,8 @@ import { AboutEditor } from './editors/AboutEditor';
 import { ContactEditor } from './editors/ContactEditor';
 import { PublishModal } from './PublishModal';
 import { PublishButton } from './PublishStatusBadge';
+import { CHAT_CONFIG } from '@/lib/chat-config';
+import { Brain, X, Loader2, CheckCircle2 } from 'lucide-react';
 
 interface PortfolioManagerProps {
     onFinish?: () => void;
@@ -40,6 +42,10 @@ export function PortfolioManager({ onFinish, isModal = false, onDataChange, defa
     const [error, setError] = useState<string | null>(null);
     const [showEditHint, setShowEditHint] = useState(false);
     const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+    // RAG rebuild state
+    const [showChatbotUpdate, setShowChatbotUpdate] = useState(false);
+    const [isRebuildingRAG, setIsRebuildingRAG] = useState(false);
+    const [ragRebuildSuccess, setRagRebuildSuccess] = useState(false);
 
     // Handle click on content when not editing - show hint notification
     const handleContentClick = () => {
@@ -83,6 +89,35 @@ export function PortfolioManager({ onFinish, isModal = false, onDataChange, defa
         setEditedData(updated);
     };
 
+    // Trigger RAG rebuild to update chatbot knowledge
+    const handleRebuildRAG = async () => {
+        setIsRebuildingRAG(true);
+        setRagRebuildSuccess(false);
+        try {
+            const token = localStorage.getItem('access_token');
+            const response = await fetch(CHAT_CONFIG.RAG_REBUILD_URL, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (response.ok) {
+                setRagRebuildSuccess(true);
+                setTimeout(() => {
+                    setShowChatbotUpdate(false);
+                    setRagRebuildSuccess(false);
+                }, 2000);
+            } else {
+                console.error('Failed to rebuild RAG');
+            }
+        } catch (err) {
+            console.error('Failed to rebuild RAG:', err);
+        } finally {
+            setIsRebuildingRAG(false);
+        }
+    };
+
     const handleSave = async () => {
         if (!editedData || !data) return;
         setIsSaving(true);
@@ -98,6 +133,9 @@ export function PortfolioManager({ onFinish, isModal = false, onDataChange, defa
             // Update local "source of truth"
             setData(editedData);
             setIsEditing(false); // Exit edit mode
+
+            // Show chatbot update notification after successful save
+            setShowChatbotUpdate(true);
 
             if (onFinish) onFinish(); // Triggers status refresh in parent
 
@@ -163,8 +201,8 @@ export function PortfolioManager({ onFinish, isModal = false, onDataChange, defa
                         )}
                     </div>
                     {/* Publish Button */}
-                    <PublishButton 
-                        onClick={() => setIsPublishModalOpen(true)} 
+                    <PublishButton
+                        onClick={() => setIsPublishModalOpen(true)}
                         className="w-full justify-center"
                     />
                 </div>
@@ -220,6 +258,7 @@ export function PortfolioManager({ onFinish, isModal = false, onDataChange, defa
                         <span className="text-sm font-medium">To edit details, please click the <strong>Edit</strong> button</span>
                     </div>
                 </div>
+
                 {/* Editor Content Area */}
                 <div
                     className="flex-1 overflow-y-auto p-6"

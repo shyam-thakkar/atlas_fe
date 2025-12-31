@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { publish } from '@/lib/publish';
 import { StructuredPortfolio } from '@/types/portfolio';
 import { PortfolioPreview } from '@/components/portfolio/PortfolioPreview';
+import { ChatWidget } from '@/components/chat';
 
 export default function PublicPortfolioPage() {
     const params = useParams();
@@ -97,7 +98,14 @@ export default function PublicPortfolioPage() {
 
     return (
         <div className="min-h-screen">
-            <PortfolioPreview data={portfolio} />
+            <PortfolioPreview data={portfolio}>
+                {/* Chat widget inside themed container so it responds to theme toggle */}
+                <ChatWidget
+                    isPublic={true}
+                    username={username}
+                    title={`Chat with ${portfolio.hero?.full_name || username}`}
+                />
+            </PortfolioPreview>
         </div>
     );
 }

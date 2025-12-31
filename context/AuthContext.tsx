@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Client-side route protection
         // If we have no token and are on a protected route, redirect
         const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-        
+
         if (!token && !isPublicRoute) {
             setIsLoading(false);
             router.push('/login');
@@ -72,8 +72,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // If we are on login/signup and have token, redirect to dashboard
         if (token && (pathname === '/login' || pathname === '/signup')) {
-             router.push('/dashboard');
-             return;
+            router.push('/dashboard');
+            return;
         }
 
         checkUser();

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { publish } from '@/lib/publish';
 import { PublishStatusResponse } from '@/types/publish';
+import { CHAT_CONFIG } from '@/lib/chat-config';
 
 interface PublishModalProps {
     isOpen: boolean;
@@ -114,6 +115,21 @@ export function PublishModal({ isOpen, onClose, onSuccess }: PublishModalProps) 
             });
             setState('success');
             onSuccess?.();
+
+            // Automatically rebuild RAG to sync chatbot knowledge after publish
+            try {
+                const token = localStorage.getItem('access_token');
+                fetch(CHAT_CONFIG.RAG_REBUILD_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+                console.log('RAG rebuild triggered after publish');
+            } catch (ragErr) {
+                console.error('Failed to trigger RAG rebuild:', ragErr);
+            }
         } catch (err: any) {
             setError(err.message || 'Failed to publish portfolio');
             setState('error');
@@ -215,10 +231,10 @@ export function PublishModal({ isOpen, onClose, onSuccess }: PublishModalProps) 
                                             onChange={(e) => setUsername(e.target.value.toLowerCase())}
                                             placeholder="yourname"
                                             className={`w-full px-4 py-3 rounded-xl border-2 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-0 transition-colors ${usernameError
-                                                    ? 'border-red-400 dark:border-red-500'
-                                                    : usernameAvailable
-                                                        ? 'border-green-400 dark:border-green-500'
-                                                        : 'border-gray-200 dark:border-zinc-700 focus:border-violet-500'
+                                                ? 'border-red-400 dark:border-red-500'
+                                                : usernameAvailable
+                                                    ? 'border-green-400 dark:border-green-500'
+                                                    : 'border-gray-200 dark:border-zinc-700 focus:border-violet-500'
                                                 }`}
                                         />
                                         {/* Status indicator */}
@@ -300,8 +316,8 @@ export function PublishModal({ isOpen, onClose, onSuccess }: PublishModalProps) 
                             <div className="flex items-center justify-between py-3 border-y border-gray-100 dark:border-zinc-800">
                                 <span className="text-sm text-gray-600 dark:text-zinc-400">Status</span>
                                 <span className={`px-3 py-1 rounded-full text-xs font-bold ${publishStatus.is_published
-                                        ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400'
-                                        : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400'
+                                    ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400'
+                                    : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400'
                                     }`}>
                                     {publishStatus.is_published ? 'Published' : 'Not Published'}
                                 </span>
@@ -366,8 +382,8 @@ export function PublishModal({ isOpen, onClose, onSuccess }: PublishModalProps) 
                                     <button
                                         onClick={copyToClipboard}
                                         className={`p-2 rounded-lg transition-colors ${copied
-                                                ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400'
-                                                : 'hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-500'
+                                            ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400'
+                                            : 'hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-500'
                                             }`}
                                         title="Copy URL"
                                     >

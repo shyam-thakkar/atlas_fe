@@ -32,7 +32,7 @@ export default function PortfolioLayout({
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="light"
-                    forcedTheme="light"
+                    enableSystem={false}
                     disableTransitionOnChange
                     storageKey="portfolio-view-theme"
                 >

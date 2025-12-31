@@ -42,9 +42,10 @@ function getMediaUrl(url: string | null | undefined): string | null {
 interface PortfolioDesign1Props {
   data: StructuredPortfolio | null;
   fullWidth?: boolean; // Use full width when in iframe/preview mode
+  children?: React.ReactNode; // Allow rendering chat widget inside themed container
 }
 
-export function PortfolioDesign1({ data, fullWidth = false }: PortfolioDesign1Props) {
+export function PortfolioDesign1({ data, fullWidth = false, children }: PortfolioDesign1Props) {
   const [view, setView] = useState<'main' | 'model-card'>('main');
   const [selectedProjectIndex, setSelectedProjectIndex] = useState<number | null>(null);
   const [isDark, setIsDark] = useState(false);
@@ -373,6 +374,9 @@ export function PortfolioDesign1({ data, fullWidth = false }: PortfolioDesign1Pr
             onClose={handleCloseProject}
           />
         )}
+
+        {/* Render children (like ChatWidget) inside themed container */}
+        {children}
       </div>
     </div>
   );
