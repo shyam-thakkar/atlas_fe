@@ -6,6 +6,7 @@ import { publish } from '@/lib/publish';
 import { StructuredPortfolio } from '@/types/portfolio';
 import { PortfolioPreview } from '@/components/portfolio/PortfolioPreview';
 import { ChatWidget } from '@/components/chat';
+import { PortfolioJsonLd } from './PortfolioJsonLd';
 
 export default function PublicPortfolioPage() {
     const params = useParams();
@@ -98,6 +99,9 @@ export default function PublicPortfolioPage() {
 
     return (
         <div className="min-h-screen">
+            {/* JSON-LD Structured Data */}
+            <PortfolioJsonLd portfolio={portfolio} username={username} />
+
             <PortfolioPreview data={portfolio}>
                 {/* Chat widget inside themed container so it responds to theme toggle */}
                 <ChatWidget
