@@ -3,13 +3,25 @@ import { MetadataRoute } from 'next';
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aifolio.in';
   
-  // Static pages
+  // Static pages - only public, indexable pages
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: siteUrl,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 1,
+    },
+    {
+      url: `${siteUrl}/login`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.5,
+    },
+    {
+      url: `${siteUrl}/signup`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.6,
     },
   ];
 
@@ -27,7 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const usernames: string[] = data.usernames || [];
       
       portfolioPages = usernames.map((username: string) => ({
-        url: `${siteUrl}/portfolio/${username}`,
+        url: `https://${username}.aifolio.in`,
         lastModified: new Date(),
         changeFrequency: 'weekly' as const,
         priority: 0.8,
