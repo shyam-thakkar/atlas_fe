@@ -2,7 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Rocket, Twitter, Github, Linkedin, Mail } from 'lucide-react';
+import Image from 'next/image';
+import { Twitter, Github, Linkedin, Mail } from 'lucide-react';
 
 export function LandingFooter() {
     return (
@@ -12,9 +13,13 @@ export function LandingFooter() {
                     {/* Brand Column */}
                     <div className="space-y-6">
                         <Link href="/" className="flex items-center gap-2 group">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:scale-110 transition-transform">
-                                <Rocket className="w-4 h-4 text-white" />
-                            </div>
+                            <Image
+                                src="/logo.png"
+                                alt="AIFolio Logo"
+                                width={32}
+                                height={32}
+                                className="group-hover:scale-110 transition-transform"
+                            />
                             <span className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
                                 AIFolio
                             </span>

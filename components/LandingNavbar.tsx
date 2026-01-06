@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { Menu, X, Rocket, Sun, Moon } from 'lucide-react';
+import Image from 'next/image';
+import { Menu, X, Sun, Moon } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 export function LandingNavbar() {
@@ -33,9 +34,13 @@ export function LandingNavbar() {
                 <div className="flex justify-between items-center">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-2 group">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:scale-110 transition-transform">
-                            <Rocket className="w-5 h-5 text-white" />
-                        </div>
+                        <Image
+                            src="/logo.png"
+                            alt="AIFolio Logo"
+                            width={40}
+                            height={40}
+                            className="group-hover:scale-110 transition-transform"
+                        />
                         <span className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
                             AIFolio
                         </span>

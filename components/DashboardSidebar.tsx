@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from 'next-themes';
@@ -96,22 +97,33 @@ export function DashboardSidebar({ collapsed = false, onToggle }: DashboardSideb
   return (
     <div className="flex flex-col h-full bg-zinc-50 dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800 transition-colors">
       {/* Header */}
-      <div className="h-12 flex items-center justify-between px-3 border-b border-zinc-100 dark:border-zinc-800/50">
+      <div className="h-12 flex items-center justify-between px-4 border-b border-zinc-100 dark:border-zinc-800/50">
         <div className="flex items-center gap-3">
+          {/* Toggle button - matches nav icon wrapper size */}
           {onToggle && (
             <button
               onClick={onToggle}
-              className="p-1.5 rounded-md hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
+              className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors flex-shrink-0"
               aria-label="Toggle sidebar"
             >
-              <svg className="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
           )}
-          <span className={`text-sm font-semibold text-zinc-800 dark:text-zinc-200 tracking-tight overflow-hidden whitespace-nowrap transition-all duration-300 ${collapsed ? 'w-0 opacity-0' : 'opacity-100'}`}>
-            AIFolio
-          </span>
+          {/* Logo and text - hide when collapsed */}
+          <div className={`flex items-center gap-2 overflow-hidden transition-all duration-300 ${collapsed ? 'w-0 opacity-0' : 'opacity-100'}`}>
+            <Image
+              src="/logo.png"
+              alt="AIFolio Logo"
+              width={28}
+              height={28}
+              className="flex-shrink-0"
+            />
+            <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 tracking-tight whitespace-nowrap">
+              AIFolio
+            </span>
+          </div>
         </div>
 
         {/* Theme Toggle */}
@@ -187,9 +199,9 @@ export function DashboardSidebar({ collapsed = false, onToggle }: DashboardSideb
             <span className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${collapsed ? 'w-0 opacity-0' : 'opacity-100'}`}>
               {isPublished ? 'Published' : 'Publish'}
             </span>
-            {/* Status dot */}
-            {isPublished && (
-              <span className={`absolute right-2 w-2 h-2 rounded-full bg-green-500 shadow-sm shadow-green-500/50 ${collapsed ? 'right-1' : ''}`} />
+            {/* Status dot - hide when collapsed */}
+            {isPublished && !collapsed && (
+              <span className="absolute right-2 w-2 h-2 rounded-full bg-green-500 shadow-sm shadow-green-500/50" />
             )}
           </button>
         </nav>

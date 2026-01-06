@@ -14,8 +14,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "Portfolio | AIFolio",
-    description: "View this portfolio created with AIFolio",
+    title: {
+        template: '%s',
+        default: 'Portfolio',
+    },
+    description: "View this professional portfolio",
 };
 
 export default function PortfolioLayout({
