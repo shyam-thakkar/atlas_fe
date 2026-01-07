@@ -12,28 +12,35 @@ export function TechStackEditor({ data, onChange }: TechStackEditorProps) {
     const stack = data || [];
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const handleAddTech = async (badge: TechBadgeData) => {
-        try {
-            // Use code_name from badge if available, otherwise search API or fallback
-            // Type-checking: Ensure codeName is string, even if badge.code_name is undefined
-            let codeName = badge.code_name;
+    const handleAddTechs = async (badges: TechBadgeData[]) => {
+        const newCodeNames: string[] = [];
+        
+        for (const badge of badges) {
+            try {
+                // Use code_name from badge if available, otherwise search API or fallback
+                let codeName = badge.code_name;
 
-            if (!codeName) {
-                const response = await apiRequest<any>(`/api/profile/tech/search/?q=${encodeURIComponent(badge.name)}`);
-                codeName = response?.code_name || badge.name.toLowerCase().replace(/\s+/g, '-');
-            }
+                if (!codeName) {
+                    const response = await apiRequest<any>(`/api/profile/tech/search/?q=${encodeURIComponent(badge.name)}`);
+                    codeName = response?.code_name || badge.name.toLowerCase().replace(/\s+/g, '-');
+                }
 
-            // Ensure codeName is string just in case
-            if (codeName && !stack.includes(codeName)) {
-                onChange([...stack, codeName]);
+                // Add if not already in stack or newCodeNames
+                if (codeName && !stack.includes(codeName) && !newCodeNames.includes(codeName)) {
+                    newCodeNames.push(codeName);
+                }
+            } catch (error) {
+                console.error('Failed to add tech:', error);
+                // Fallback: use normalized name as code_name
+                const codeName = badge.name.toLowerCase().replace(/\s+/g, '-');
+                if (!stack.includes(codeName) && !newCodeNames.includes(codeName)) {
+                    newCodeNames.push(codeName);
+                }
             }
-        } catch (error) {
-            console.error('Failed to add tech:', error);
-            // Fallback: use normalized name as code_name
-            const codeName = badge.name.toLowerCase().replace(/\s+/g, '-');
-            if (!stack.includes(codeName)) {
-                onChange([...stack, codeName]);
-            }
+        }
+
+        if (newCodeNames.length > 0) {
+            onChange([...stack, ...newCodeNames]);
         }
     };
 
@@ -90,7 +97,8 @@ export function TechStackEditor({ data, onChange }: TechStackEditorProps) {
             <TechBadgeModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onSelect={handleAddTech}
+                onSelect={handleAddTechs}
+                existingTechCodes={stack}
             />
         </div>
     );

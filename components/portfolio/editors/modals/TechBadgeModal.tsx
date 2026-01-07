@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { Search, Plus, X, Globe, Code } from "lucide-react";
+import { Search, Plus, X, Globe, Code, Check } from "lucide-react";
 import { DESCRIPTION_TECH_BADGES, TechBadgeData } from "@/types/tech-badge";
 import { AutoResizeTextarea } from "@/components/ui/AutoResizeTextarea";
 import { apiRequest } from "@/lib/api";
@@ -10,10 +10,11 @@ import { apiRequest } from "@/lib/api";
 interface TechBadgeModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSelect: (badge: TechBadgeData) => void;
+    onSelect: (badges: TechBadgeData[]) => void;
+    existingTechCodes?: string[]; // Already selected tech codes to prevent duplicates
 }
 
-export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProps) {
+export function TechBadgeModal({ isOpen, onClose, onSelect, existingTechCodes = [] }: TechBadgeModalProps) {
     const [mounted, setMounted] = useState(false);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -22,6 +23,9 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
     const [searchResults, setSearchResults] = useState<TechBadgeData[]>([]);
     const [isCustomMode, setIsCustomMode] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+
+    // Multi-select state
+    const [selectedBadges, setSelectedBadges] = useState<TechBadgeData[]>([]);
 
     // Pagination State
     const [page, setPage] = useState(1);
@@ -186,7 +190,7 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
                 variant: newBadge.color_variant || customVariant
             };
 
-            onSelect(mappedBadge);
+            onSelect([mappedBadge]);
             onClose();
             resetForm();
         } catch (error) {
@@ -205,6 +209,38 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
         setIsCustomMode(false);
         setSearchQuery("");
         setSearchResults([]); // Clear search results on form reset
+        setSelectedBadges([]); // Clear selected badges on form reset
+    };
+
+    // Toggle badge selection
+    const toggleBadgeSelection = (badge: TechBadgeData) => {
+        setSelectedBadges(prev => {
+            const isSelected = prev.some(b => b.code_name === badge.code_name);
+            if (isSelected) {
+                return prev.filter(b => b.code_name !== badge.code_name);
+            } else {
+                return [...prev, badge];
+            }
+        });
+    };
+
+    // Check if a badge is selected
+    const isBadgeSelected = (badge: TechBadgeData) => {
+        return selectedBadges.some(b => b.code_name === badge.code_name);
+    };
+
+    // Check if a badge is already added (from existingTechCodes)
+    const isBadgeAlreadyAdded = (badge: TechBadgeData) => {
+        return badge.code_name ? existingTechCodes.includes(badge.code_name) : false;
+    };
+
+    // Handle adding all selected badges
+    const handleAddSelected = () => {
+        if (selectedBadges.length > 0) {
+            onSelect(selectedBadges);
+            onClose();
+            resetForm();
+        }
     };
 
     if (!isOpen || !mounted) return null;
@@ -254,37 +290,68 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
                             </div>
                         </div>
 
-                        <div ref={scrollContainerRef} className="overflow-y-auto p-4 h-[350px]" onScroll={handleScroll}>
+                        <div ref={scrollContainerRef} className="overflow-y-auto p-4 h-[300px]" onScroll={handleScroll}>
                             {/* RESULTS LIST */}
                             {searchResults.length > 0 ? (
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                    {searchResults.map((badge, idx) => (
-                                        <button
-                                            key={`${badge.name}-${idx}`}
-                                            onClick={() => {
-                                                onSelect(badge);
-                                                onClose();
-                                            }}
-                                            className="flex items-center gap-2 p-2 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all text-left group"
-                                        >
-                                            <div className="w-8 h-8 flex items-center justify-center bg-zinc-100 dark:bg-zinc-800 rounded p-1 group-hover:scale-110 transition-transform">
-                                                {badge.imageSrc ? (
-                                                    <img
-                                                        src={badge.imageSrc}
-                                                        alt=""
-                                                        className={`w-full h-full object-contain ${badge.variant === 'black' ? 'dark:invert' :
-                                                            badge.variant === 'white' ? ' invert dark:invert-0' : ''
-                                                            }`}
-                                                    />
-                                                ) : (
-                                                    <Code className="w-4 h-4 text-zinc-400" />
+                                    {searchResults.map((badge, idx) => {
+                                        const isSelected = isBadgeSelected(badge);
+                                        const isAlreadyAdded = isBadgeAlreadyAdded(badge);
+                                        
+                                        return (
+                                            <button
+                                                key={`${badge.name}-${idx}`}
+                                                onClick={() => {
+                                                    if (!isAlreadyAdded) {
+                                                        toggleBadgeSelection(badge);
+                                                    }
+                                                }}
+                                                disabled={isAlreadyAdded}
+                                                className={`relative flex items-center gap-2 p-2 rounded-lg border transition-all text-left group ${
+                                                    isAlreadyAdded
+                                                        ? 'border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 opacity-50 cursor-not-allowed'
+                                                        : isSelected
+                                                            ? 'border-emerald-500 dark:border-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 ring-1 ring-emerald-500/20'
+                                                            : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                                                }`}
+                                            >
+                                                {/* Selection indicator */}
+                                                {isSelected && (
+                                                    <div className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center shadow-sm">
+                                                        <Check className="w-3 h-3 text-white" />
+                                                    </div>
                                                 )}
-                                            </div>
-                                            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300 truncate">
-                                                {badge.name}
-                                            </span>
-                                        </button>
-                                    ))}
+                                                {isAlreadyAdded && (
+                                                    <div className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-zinc-400 dark:bg-zinc-600 rounded-full flex items-center justify-center shadow-sm">
+                                                        <Check className="w-3 h-3 text-white" />
+                                                    </div>
+                                                )}
+                                                
+                                                <div className={`w-8 h-8 flex items-center justify-center bg-zinc-100 dark:bg-zinc-800 rounded p-1 transition-transform ${!isAlreadyAdded ? 'group-hover:scale-110' : ''}`}>
+                                                    {badge.imageSrc ? (
+                                                        <img
+                                                            src={badge.imageSrc}
+                                                            alt=""
+                                                            className={`w-full h-full object-contain ${badge.variant === 'black' ? 'dark:invert' :
+                                                                badge.variant === 'white' ? ' invert dark:invert-0' : ''
+                                                                }`}
+                                                        />
+                                                    ) : (
+                                                        <Code className="w-4 h-4 text-zinc-400" />
+                                                    )}
+                                                </div>
+                                                <span className={`text-sm font-medium truncate ${
+                                                    isAlreadyAdded 
+                                                        ? 'text-zinc-400 dark:text-zinc-500' 
+                                                        : isSelected 
+                                                            ? 'text-emerald-700 dark:text-emerald-300'
+                                                            : 'text-zinc-700 dark:text-zinc-300'
+                                                }`}>
+                                                    {badge.name}
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
                                     {isLoadingMore && (
                                         <div className="col-span-full py-4 flex justify-center text-zinc-400 dark:text-zinc-500 text-sm">
                                             Loading more...
@@ -331,6 +398,40 @@ export function TechBadgeModal({ isOpen, onClose, onSelect }: TechBadgeModalProp
                                     </button>
                                 </div>
                             )}
+                        </div>
+
+                        {/* Footer with selection count and Add button */}
+                        <div className="p-4 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50 flex items-center justify-between">
+                            <div className="text-sm text-zinc-500 dark:text-zinc-400">
+                                {selectedBadges.length > 0 ? (
+                                    <span className="flex items-center gap-2">
+                                        <span className="inline-flex items-center justify-center w-5 h-5 bg-emerald-500 text-white text-xs font-bold rounded-full">
+                                            {selectedBadges.length}
+                                        </span>
+                                        selected
+                                    </span>
+                                ) : (
+                                    <span>Select technologies to add</span>
+                                )}
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleAddSelected}
+                                    disabled={selectedBadges.length === 0}
+                                    className="px-6 py-2 bg-black dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                    Add {selectedBadges.length > 0 ? `(${selectedBadges.length})` : 'Selected'}
+                                </button>
+                            </div>
                         </div>
                     </>
                 ) : (

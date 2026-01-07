@@ -74,13 +74,13 @@ export function AboutEditor({ data, onChange }: AboutEditorProps) {
             <TechBadgeModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onSelect={(badge) => {
-                    // Logic to insert badge code
-                    // If it's a new custom badge, we might want to store it somewhere globally or just rely on the name lookup if we had a dynamic backend.
-                    // For now, prompt implies we just insert the {{code}} and the frontend renderer handles it (or falls back).
-                    // In a real app, 'onSelect' might check if it needs to be POSTed to backend first.
-                    const code = badge.code_name || badge.name.toLowerCase().replace(/\s+/g, '');
-                    insertCode(`{{${code}}}`);
+                onSelect={(badges) => {
+                    // Insert all selected badges at cursor position
+                    const codes = badges.map(badge => {
+                        const code = badge.code_name || badge.name?.toLowerCase().replace(/\s+/g, '') || 'unknown';
+                        return `{{${code}}}`;
+                    });
+                    insertCode(codes.join(' '));
                 }}
             />
         </div>

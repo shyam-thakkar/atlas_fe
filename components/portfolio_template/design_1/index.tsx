@@ -75,7 +75,7 @@ export function PortfolioDesign1({ data, fullWidth = false, children }: Portfoli
       greeting: "Hey! I'm " + (data.hero.full_name || "User"),
       typingText: data.hero.headline || "Developer",
       profileImage: getMediaUrl(data.hero.profile_image) || "/profile.png",
-      description: data.about.long_bio || "No bio available.",
+      description: data.about.long_bio || "",
     };
   }, [data]);
 
@@ -206,10 +206,12 @@ export function PortfolioDesign1({ data, fullWidth = false, children }: Portfoli
                 </div>
 
                 <div>
-                  {/* Description with Badges */}
-                  <div className="text-lg leading-loose text-zinc-600 dark:text-zinc-400 mb-8 transition-colors duration-300" style={{ lineHeight: '2.2' }}>
-                    {renderBioWithBadges(personalInfo.description)}
-                  </div>
+                  {/* Description with Badges - only show if bio exists */}
+                  {personalInfo.description && personalInfo.description.trim() && (
+                    <div className="text-lg leading-loose text-zinc-600 dark:text-zinc-400 mb-8 transition-colors duration-300" style={{ lineHeight: '2.2' }}>
+                      {renderBioWithBadges(personalInfo.description)}
+                    </div>
+                  )}
 
                   {/* Social Media Links */}
                   <div className="flex flex-wrap items-center gap-3">
@@ -234,71 +236,71 @@ export function PortfolioDesign1({ data, fullWidth = false, children }: Portfoli
               </section>
 
               {/* Tech Stack Section */}
-              <section className="py-8">
-                <h2 className="text-3xl font-bold text-black dark:text-white mb-6 transition-colors duration-300">
-                  Tech Stack
-                </h2>
-                {data.tech_stack.length > 0 ? (
+              {data.tech_stack.length > 0 && (
+                <section className="py-8">
+                  <h2 className="text-3xl font-bold text-black dark:text-white mb-6 transition-colors duration-300">
+                    Tech Stack
+                  </h2>
                   <div className="flex flex-wrap gap-3">
                     {data.tech_stack.map((tech, i) => (
                       <TechStackIcon key={i} codeName={tech} />
                     ))}
                   </div>
-                ) : (
-                  <p className="text-zinc-500 dark:text-zinc-400 text-sm">No tech stack added yet.</p>
-                )}
-              </section>
+                </section>
+              )}
+
+              {/* Experience Section */}
+              <Experience data={data.experience} />
 
               {/* Projects Section */}
-              <section className="py-8">
-                {/* Experience Section */}
-                <Experience data={data.experience} />
+              {data.projects && data.projects.length > 0 && (
+                <section className="py-8">
+                  <h2 className="text-3xl font-bold text-black dark:text-white mb-6 transition-colors duration-300">
+                    Projects
+                  </h2>
 
-                <h2 className="text-3xl font-bold text-black dark:text-white mb-6 mt-12 transition-colors duration-300">
-                  Projects
-                </h2>
-
-                {/* All Projects - Card Style Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Real Data Projects */}
-                  {data.projects.map((proj, i) => (
-                    <ProjectCard
-                      key={i}
-                      project={{
-                        title: proj.title,
-                        description: proj.description,
-                        image: getMediaUrl(proj.thumbnail_url) || undefined,
-                        tags: proj.technologies || [],
-                        technologies: proj.technologies || [], // Pass tech code names for icon rendering
-                        liveUrl: proj.live_url || undefined,
-                        githubUrl: proj.repo_url || undefined,
-                        variant: "card"
-                      }}
-                      onClick={() => openProjectDetail(i)}
-                    />
-                  ))}
-                </div>
-              </section>
+                  {/* All Projects - Card Style Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Real Data Projects */}
+                    {data.projects.map((proj, i) => (
+                      <ProjectCard
+                        key={i}
+                        project={{
+                          title: proj.title,
+                          description: proj.description,
+                          image: getMediaUrl(proj.thumbnail_url) || undefined,
+                          tags: proj.technologies || [],
+                          technologies: proj.technologies || [], // Pass tech code names for icon rendering
+                          liveUrl: proj.live_url || undefined,
+                          githubUrl: proj.repo_url || undefined,
+                          variant: "card"
+                        }}
+                        onClick={() => openProjectDetail(i)}
+                      />
+                    ))}
+                  </div>
+                </section>
+              )}
 
               {/* Education Section */}
-              <section className="py-8">
-                <h2 className="text-3xl font-bold text-black dark:text-white mb-6 transition-colors duration-300">
-                  Education
-                </h2>
-                {data.education && data.education.length > 0 ? (
+              {data.education && data.education.length > 0 && (
+                <section className="py-8">
+                  <h2 className="text-3xl font-bold text-black dark:text-white mb-6 transition-colors duration-300">
+                    Education
+                  </h2>
                   <div className="space-y-4">
                     {data.education.map((edu, index) => {
                       // Format dates nicely - handles ISO dates, year-only, and Present
                       const formatDate = (dateStr: string) => {
                         if (!dateStr) return '';
                         if (dateStr === 'Present') return 'Present';
-                        
+
                         // Check if it's year-only (just 4 digits)
                         const yearOnlyMatch = dateStr.match(/^(\d{4})$/);
                         if (yearOnlyMatch) {
                           return yearOnlyMatch[1];
                         }
-                        
+
                         // Try ISO date format
                         const date = new Date(dateStr);
                         if (!isNaN(date.getTime())) {
@@ -351,10 +353,8 @@ export function PortfolioDesign1({ data, fullWidth = false, children }: Portfoli
                       );
                     })}
                   </div>
-                ) : (
-                  <p className="text-zinc-500 dark:text-zinc-400 text-sm">No education added yet.</p>
-                )}
-              </section>
+                </section>
+              )}
 
               {/* Contact Section */}
               <ContactSection socials={data.socials} contact={data.contact} />

@@ -118,30 +118,38 @@ export function ProjectsEditor({ data, onChange }: ProjectsEditorProps) {
         setTechnicalChallengesText(projects.map(p => (p.technical_challenges || []).join('\n')));
     }, [projects.length]); // Only re-init when projects array length changes
     
-    // Handle adding a technology to a specific project
-    const handleAddTech = async (projectIndex: number, badge: TechBadgeData) => {
-        try {
-            let codeName = badge.code_name;
-            if (!codeName) {
-                const response = await apiRequest<any>(`/api/profile/tech/search/?q=${encodeURIComponent(badge.name)}`);
-                codeName = response?.code_name || badge.name.toLowerCase().replace(/\s+/g, '-');
+    // Handle adding technologies to a specific project
+    const handleAddTechs = async (projectIndex: number, badges: TechBadgeData[]) => {
+        const newCodeNames: string[] = [];
+        const currentTechs = projects[projectIndex].technologies || [];
+        
+        for (const badge of badges) {
+            try {
+                let codeName = badge.code_name;
+                if (!codeName && badge.name) {
+                    const response = await apiRequest<any>(`/api/profile/tech/search/?q=${encodeURIComponent(badge.name)}`);
+                    codeName = response?.code_name || badge.name.toLowerCase().replace(/\s+/g, '-');
+                }
+                
+                if (codeName && !currentTechs.includes(codeName) && !newCodeNames.includes(codeName)) {
+                    newCodeNames.push(codeName);
+                }
+            } catch (error) {
+                console.error('Failed to add tech:', error);
+                const codeName = badge.name?.toLowerCase().replace(/\s+/g, '-') || 'unknown';
+                if (!currentTechs.includes(codeName) && !newCodeNames.includes(codeName)) {
+                    newCodeNames.push(codeName);
+                }
             }
-            
-            const currentTechs = projects[projectIndex].technologies || [];
-            if (codeName && !currentTechs.includes(codeName)) {
-                const newProj = [...projects];
-                newProj[projectIndex] = { ...newProj[projectIndex], technologies: [...currentTechs, codeName] };
-                onChange(newProj);
-            }
-        } catch (error) {
-            console.error('Failed to add tech:', error);
-            const codeName = badge.name.toLowerCase().replace(/\s+/g, '-');
-            const currentTechs = projects[projectIndex].technologies || [];
-            if (!currentTechs.includes(codeName)) {
-                const newProj = [...projects];
-                newProj[projectIndex] = { ...newProj[projectIndex], technologies: [...currentTechs, codeName] };
-                onChange(newProj);
-            }
+        }
+        
+        if (newCodeNames.length > 0) {
+            const newProj = [...projects];
+            newProj[projectIndex] = { 
+                ...newProj[projectIndex], 
+                technologies: [...currentTechs, ...newCodeNames] 
+            };
+            onChange(newProj);
         }
     };
     
@@ -228,7 +236,8 @@ export function ProjectsEditor({ data, onChange }: ProjectsEditorProps) {
                         <TechBadgeModal
                             isOpen={techModalOpenIndex === i}
                             onClose={() => setTechModalOpenIndex(null)}
-                            onSelect={(badge) => handleAddTech(i, badge)}
+                            onSelect={(badges) => handleAddTechs(i, badges)}
+                            existingTechCodes={proj.technologies || []}
                         />
                     </div>
 

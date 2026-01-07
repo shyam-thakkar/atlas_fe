@@ -33,15 +33,7 @@ export function Experience({ data }: ExperienceProps) {
   }, [data]);
 
   if (!experiences || experiences.length === 0) {
-    return (
-      <section className="py-2">
-        <h2 className="text-3xl font-bold text-black dark:text-white mb-8 flex items-center gap-3">
-          <Briefcase className="w-8 h-8" aria-hidden="true" />
-          Experience
-        </h2>
-        <p className="text-zinc-500 dark:text-zinc-400">No experience added yet.</p>
-      </section>
-    );
+    return null;
   }
 
   return (
