@@ -2,6 +2,7 @@ import React from 'react';
 import { EducationItem } from '@/types/portfolio';
 import { DateSelector } from '@/components/ui/DateSelector';
 import { AutoResizeTextarea } from '@/components/ui/AutoResizeTextarea';
+import { AITextarea } from '@/components/ui/AITextarea';
 
 interface EducationEditorProps {
     data: EducationItem[] | null;
@@ -162,14 +163,21 @@ export function EducationEditor({ data, onChange }: EducationEditorProps) {
                         <label className="text-xs text-gray-500 dark:text-zinc-400 font-bold uppercase tracking-wide block mb-1.5">
                             Description <span className="text-gray-400 dark:text-zinc-500 font-normal normal-case ml-1">(Optional - achievements, activities, etc.)</span>
                         </label>
-                        <AutoResizeTextarea
+                        <AITextarea
+                            section="education"
+                            itemIndex={i}
                             value={edu.description || ''}
                             onChange={e => {
                                 const newEdu = [...education];
                                 newEdu[i] = { ...newEdu[i], description: e.target.value };
                                 onChange(newEdu);
                             }}
-                            className="w-full text-sm px-3 py-2.5 border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 rounded-lg focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-400 dark:focus:border-indigo-500 outline-none transition-all leading-relaxed"
+                            onAIRewrite={(newContent) => {
+                                const newEdu = [...education];
+                                newEdu[i] = { ...newEdu[i], description: newContent };
+                                onChange(newEdu);
+                            }}
+                            className="w-full text-sm px-3 py-2.5 border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 rounded-lg focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-400 dark:focus:border-indigo-500 outline-none transition-all leading-relaxed resize-none min-h-[60px]"
                             placeholder="Describe your achievements, activities, or relevant coursework..."
                             rows={2}
                         />

@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { AboutSection } from '@/types/portfolio';
 import { AutoResizeTextarea } from '@/components/ui/AutoResizeTextarea';
 import { TechBadgeModal } from './modals/TechBadgeModal';
+import { AITextarea } from '@/components/ui/AITextarea';
 import { Plus } from 'lucide-react';
 
 interface AboutEditorProps {
@@ -57,11 +58,12 @@ export function AboutEditor({ data, onChange }: AboutEditorProps) {
                 </div>
 
                 <div className="relative">
-                    <AutoResizeTextarea
-                        ref={textareaRef}
-                        value={about.long_bio}
+                    <AITextarea
+                        section="bio_long"
+                        value={about.long_bio || ''}
                         onChange={e => onChange({ ...about, long_bio: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none transition-all text-base leading-relaxed font-mono text-sm min-h-[200px]"
+                        onAIRewrite={(newContent) => onChange({ ...about, long_bio: newContent })}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none transition-all text-base leading-relaxed font-mono text-sm min-h-[200px] resize-none"
                         placeholder="Tell your professional story... Click 'Add Tech Badge' to insert interactive badges."
                         rows={8}
                     />

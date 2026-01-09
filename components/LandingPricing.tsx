@@ -5,46 +5,49 @@ import { Check, Zap, Rocket, Star } from 'lucide-react';
 
 const tiers = [
     {
-        name: "Trial",
+        name: "Free",
         price: "0",
-        description: "Perfect for testing the waters and seeing the magic.",
+        period: "/forever",
+        description: "Perfect for getting started and exploring the platform.",
         features: [
             "1 AI Portfolio Generation",
             "Basic Template Access",
-            "Standard Support",
+            "Community Support",
             "AIFolio Branding"
         ],
-        cta: "Start for Free",
+        cta: "Get Started Free",
         highlight: false
     },
     {
         name: "Pro",
-        price: "19",
-        description: "For professionals who want to stand out and land the job.",
+        price: "149",
+        period: "/month",
+        description: "For professionals who want to stand out and land their dream job.",
         features: [
             "Unlimited AI Generations",
-            "Premium Template Library",
+            "All Premium Templates",
             "Custom Domain Support",
             "Advanced SEO Tools",
             "No AIFolio Branding",
-            "Priority Email Support"
+            "Priority Support"
         ],
-        cta: "Go Pro Now",
+        cta: "Upgrade to Pro",
         highlight: true
     },
     {
-        name: "Enterprise",
-        price: "49",
-        description: "Custom solutions for teams and high-volume needs.",
+        name: "Lifetime",
+        price: "499",
+        period: "one-time",
+        description: "Pay once, own forever. Best value for serious professionals.",
         features: [
             "Everything in Pro",
-            "Multiple User Profiles",
-            "API Access",
-            "Dedicated Support Manager",
-            "Custom Contract & Billing",
-            "White-labeling Options"
+            "Lifetime Access",
+            "All Future Updates",
+            "Early Access to Features",
+            "Exclusive Templates",
+            "1-on-1 Setup Support"
         ],
-        cta: "Contact Sales",
+        cta: "Get Lifetime Access",
         highlight: false
     }
 ];
@@ -84,8 +87,8 @@ export function LandingPricing() {
                             <div className="mb-8">
                                 <h4 className="text-lg font-bold mb-2 uppercase tracking-wide opacity-80">{tier.name}</h4>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-5xl font-extrabold tracking-tight">${tier.price}</span>
-                                    <span className="text-sm font-medium opacity-60">/month</span>
+                                    <span className="text-5xl font-extrabold tracking-tight">₹{tier.price}</span>
+                                    <span className="text-sm font-medium opacity-60">{tier.period}</span>
                                 </div>
                                 <p className="mt-4 text-sm opacity-70 leading-relaxed italic">{tier.description}</p>
                             </div>

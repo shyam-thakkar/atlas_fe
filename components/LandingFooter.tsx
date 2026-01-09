@@ -29,13 +29,13 @@ export function LandingFooter() {
                             Build your professional presence in seconds.
                         </p>
                         <div className="flex items-center gap-4">
-                            <Link href="#" className="p-2 rounded-lg bg-gray-50 dark:bg-zinc-900 text-gray-500 dark:text-zinc-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
+                            <Link href="https://x.com/YOUR_X_USERNAME" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-gray-50 dark:bg-zinc-900 text-gray-500 dark:text-zinc-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
                                 <Twitter className="w-5 h-5" />
                             </Link>
-                            <Link href="#" className="p-2 rounded-lg bg-gray-50 dark:bg-zinc-900 text-gray-500 dark:text-zinc-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
+                            <Link href="https://github.com/shyam-thakkar" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-gray-50 dark:bg-zinc-900 text-gray-500 dark:text-zinc-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
                                 <Github className="w-5 h-5" />
                             </Link>
-                            <Link href="#" className="p-2 rounded-lg bg-gray-50 dark:bg-zinc-900 text-gray-500 dark:text-zinc-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
+                            <Link href="https://www.linkedin.com/in/shyam-thakkar167/" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-gray-50 dark:bg-zinc-900 text-gray-500 dark:text-zinc-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
                                 <Linkedin className="w-5 h-5" />
                             </Link>
                         </div>
@@ -69,7 +69,7 @@ export function LandingFooter() {
                         <ul className="space-y-4">
                             <li className="flex items-center gap-3 text-sm text-gray-600 dark:text-zinc-400">
                                 <Mail className="w-4 h-4 text-violet-600" />
-                                hello@atlas.com
+                                shyam@aifolio.in
                             </li>
                             <li className="pt-2">
                                 <div className="p-4 rounded-2xl bg-violet-600/5 dark:bg-violet-500/5 border border-violet-600/10 dark:border-violet-500/10">

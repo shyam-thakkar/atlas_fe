@@ -4,6 +4,7 @@ import { AutoResizeTextarea } from '@/components/ui/AutoResizeTextarea';
 import { TechBadgeModal } from './modals/TechBadgeModal';
 import { TechBadgeData } from '@/types/tech-badge';
 import { apiRequest } from '@/lib/api';
+import { AITextarea } from '@/components/ui/AITextarea';
 
 // Mini tech icon component for Projects Editor - smaller than TechStackItem, with remove button
 interface MiniTechItemProps {
@@ -52,7 +53,7 @@ function MiniTechItem({ codeName, onRemove }: MiniTechItemProps) {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
-                <div 
+                <div
                     className="w-10 h-10 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 rounded-lg flex flex-col items-center justify-center p-1"
                     title={codeName}
                 >
@@ -82,7 +83,7 @@ function MiniTechItem({ codeName, onRemove }: MiniTechItemProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
-            <div 
+            <div
                 className="w-10 h-10 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg flex flex-col items-center justify-center p-1 hover:border-gray-300 dark:hover:border-zinc-600 transition-colors"
                 title={techData.display_name || codeName}
             >
@@ -104,11 +105,11 @@ interface ProjectsEditorProps {
 
 export function ProjectsEditor({ data, onChange }: ProjectsEditorProps) {
     const projects = data || [];
-    
+
     // Local state to preserve cursor position in textareas
     const [keyFeaturesText, setKeyFeaturesText] = React.useState<string[]>([]);
     const [technicalChallengesText, setTechnicalChallengesText] = React.useState<string[]>([]);
-    
+
     // Modal state for tech selection - tracks which project's modal is open
     const [techModalOpenIndex, setTechModalOpenIndex] = useState<number | null>(null);
 
@@ -117,12 +118,12 @@ export function ProjectsEditor({ data, onChange }: ProjectsEditorProps) {
         setKeyFeaturesText(projects.map(p => (p.key_features || []).join('\n')));
         setTechnicalChallengesText(projects.map(p => (p.technical_challenges || []).join('\n')));
     }, [projects.length]); // Only re-init when projects array length changes
-    
+
     // Handle adding technologies to a specific project
     const handleAddTechs = async (projectIndex: number, badges: TechBadgeData[]) => {
         const newCodeNames: string[] = [];
         const currentTechs = projects[projectIndex].technologies || [];
-        
+
         for (const badge of badges) {
             try {
                 let codeName = badge.code_name;
@@ -130,7 +131,7 @@ export function ProjectsEditor({ data, onChange }: ProjectsEditorProps) {
                     const response = await apiRequest<any>(`/api/profile/tech/search/?q=${encodeURIComponent(badge.name)}`);
                     codeName = response?.code_name || badge.name.toLowerCase().replace(/\s+/g, '-');
                 }
-                
+
                 if (codeName && !currentTechs.includes(codeName) && !newCodeNames.includes(codeName)) {
                     newCodeNames.push(codeName);
                 }
@@ -142,17 +143,17 @@ export function ProjectsEditor({ data, onChange }: ProjectsEditorProps) {
                 }
             }
         }
-        
+
         if (newCodeNames.length > 0) {
             const newProj = [...projects];
-            newProj[projectIndex] = { 
-                ...newProj[projectIndex], 
-                technologies: [...currentTechs, ...newCodeNames] 
+            newProj[projectIndex] = {
+                ...newProj[projectIndex],
+                technologies: [...currentTechs, ...newCodeNames]
             };
             onChange(newProj);
         }
     };
-    
+
     // Handle removing a technology from a specific project
     const handleRemoveTech = (projectIndex: number, techCodeName: string) => {
         const newProj = [...projects];
@@ -187,19 +188,26 @@ export function ProjectsEditor({ data, onChange }: ProjectsEditorProps) {
                     </div>
                     <div className="mb-4">
                         <label className="text-xs text-gray-500 dark:text-zinc-400 font-bold uppercase tracking-wide block mb-1.5">Description</label>
-                        <AutoResizeTextarea
+                        <AITextarea
+                            section="project"
+                            itemIndex={i}
                             value={proj.description || ''}
                             onChange={e => {
                                 const newProj = [...projects];
                                 newProj[i] = { ...newProj[i], description: e.target.value };
                                 onChange(newProj);
                             }}
-                            className="w-full text-sm px-3 py-2.5 border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 rounded-lg focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-400 dark:focus:border-indigo-500 outline-none transition-all"
+                            onAIRewrite={(newContent) => {
+                                const newProj = [...projects];
+                                newProj[i] = { ...newProj[i], description: newContent };
+                                onChange(newProj);
+                            }}
+                            className="w-full text-sm px-3 py-2.5 border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 rounded-lg focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-400 dark:focus:border-indigo-500 outline-none transition-all resize-none min-h-[60px]"
                             placeholder="A brief overview of the project..."
                             rows={2}
                         />
                     </div>
-                    
+
                     {/* Tech Stack - Modal-based selection like TechStackEditor */}
                     <div className="mb-4">
                         <div className="flex items-center justify-between mb-2">
@@ -214,14 +222,14 @@ export function ProjectsEditor({ data, onChange }: ProjectsEditorProps) {
                                 Add Tech
                             </button>
                         </div>
-                        
+
                         {/* Tech Icons Grid */}
                         {proj.technologies && proj.technologies.filter(t => t.trim()).length > 0 ? (
                             <div className="flex flex-wrap gap-2 p-3 bg-gray-50 dark:bg-zinc-800/50 rounded-lg border border-gray-100 dark:border-zinc-700">
                                 {proj.technologies.map(s => s.trim()).filter(Boolean).map((tech, idx) => (
-                                    <MiniTechItem 
-                                        key={idx} 
-                                        codeName={tech} 
+                                    <MiniTechItem
+                                        key={idx}
+                                        codeName={tech}
                                         onRemove={() => handleRemoveTech(i, tech)}
                                     />
                                 ))}
@@ -231,7 +239,7 @@ export function ProjectsEditor({ data, onChange }: ProjectsEditorProps) {
                                 <p className="text-xs text-gray-400 dark:text-zinc-500">No technologies added. Click "Add Tech" to select.</p>
                             </div>
                         )}
-                        
+
                         {/* Tech Badge Modal for this project */}
                         <TechBadgeModal
                             isOpen={techModalOpenIndex === i}
@@ -246,7 +254,9 @@ export function ProjectsEditor({ data, onChange }: ProjectsEditorProps) {
                         <label className="text-xs text-gray-500 dark:text-zinc-400 font-bold uppercase tracking-wide block mb-1.5">
                             Key Features <span className="text-gray-400 dark:text-zinc-500 font-normal normal-case ml-1">(Optional - Each new line will be a bullet point)</span>
                         </label>
-                        <AutoResizeTextarea
+                        <AITextarea
+                            section="project_features"
+                            itemIndex={i}
                             value={keyFeaturesText[i] || ''}
                             onChange={e => {
                                 // Update local text state
@@ -260,7 +270,28 @@ export function ProjectsEditor({ data, onChange }: ProjectsEditorProps) {
                                 newProj[i] = { ...newProj[i], key_features: lines };
                                 onChange(newProj);
                             }}
-                            className="w-full text-sm px-3 py-2.5 border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 rounded-lg focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-400 dark:focus:border-indigo-500 outline-none transition-all leading-relaxed"
+                            onAIRewrite={(newContent) => {
+                                try {
+                                    const features = JSON.parse(newContent);
+                                    const newProj = [...projects];
+                                    newProj[i] = { ...newProj[i], key_features: features };
+                                    onChange(newProj);
+                                    // Update local text state
+                                    const newTextState = [...keyFeaturesText];
+                                    newTextState[i] = features.join('\n');
+                                    setKeyFeaturesText(newTextState);
+                                } catch {
+                                    // If not JSON, treat as newline-separated
+                                    const features = newContent.split('\n').map((l: string) => l.trim()).filter(Boolean);
+                                    const newProj = [...projects];
+                                    newProj[i] = { ...newProj[i], key_features: features };
+                                    onChange(newProj);
+                                    const newTextState = [...keyFeaturesText];
+                                    newTextState[i] = features.join('\n');
+                                    setKeyFeaturesText(newTextState);
+                                }
+                            }}
+                            className="w-full text-sm px-3 py-2.5 border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 rounded-lg focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-400 dark:focus:border-indigo-500 outline-none transition-all leading-relaxed resize-none min-h-[80px]"
                             placeholder="Real-time data processing&#10;User authentication&#10;Responsive design"
                             rows={3}
                         />
@@ -271,7 +302,9 @@ export function ProjectsEditor({ data, onChange }: ProjectsEditorProps) {
                         <label className="text-xs text-gray-500 dark:text-zinc-400 font-bold uppercase tracking-wide block mb-1.5">
                             Technical Challenges <span className="text-gray-400 dark:text-zinc-500 font-normal normal-case ml-1">(Optional - Each new line will be a bullet point)</span>
                         </label>
-                        <AutoResizeTextarea
+                        <AITextarea
+                            section="project_challenges"
+                            itemIndex={i}
                             value={technicalChallengesText[i] || ''}
                             onChange={e => {
                                 // Update local text state
@@ -285,8 +318,29 @@ export function ProjectsEditor({ data, onChange }: ProjectsEditorProps) {
                                 newProj[i] = { ...newProj[i], technical_challenges: lines };
                                 onChange(newProj);
                             }}
-                            className="w-full text-sm px-3 py-2.5 border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 rounded-lg focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-400 dark:focus:border-indigo-500 outline-none transition-all leading-relaxed"
-                            placeholder="Optimizing performance&#10;Scaling infrastructure&#10;Managing state complexity"
+                            onAIRewrite={(newContent) => {
+                                try {
+                                    const challenges = JSON.parse(newContent);
+                                    const newProj = [...projects];
+                                    newProj[i] = { ...newProj[i], technical_challenges: challenges };
+                                    onChange(newProj);
+                                    // Update local text state
+                                    const newTextState = [...technicalChallengesText];
+                                    newTextState[i] = challenges.join('\n');
+                                    setTechnicalChallengesText(newTextState);
+                                } catch {
+                                    // If not JSON, treat as newline-separated
+                                    const challenges = newContent.split('\n').map((l: string) => l.trim()).filter(Boolean);
+                                    const newProj = [...projects];
+                                    newProj[i] = { ...newProj[i], technical_challenges: challenges };
+                                    onChange(newProj);
+                                    const newTextState = [...technicalChallengesText];
+                                    newTextState[i] = challenges.join('\n');
+                                    setTechnicalChallengesText(newTextState);
+                                }
+                            }}
+                            className="w-full text-sm px-3 py-2.5 border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 rounded-lg focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-400 dark:focus:border-indigo-500 outline-none transition-all leading-relaxed resize-none min-h-[80px]"
+                            placeholder="Optimizing database queries&#10;Handling concurrent users&#10;Integrating third-party APIs"
                             rows={3}
                         />
                     </div>
@@ -471,11 +525,11 @@ export function ProjectsEditor({ data, onChange }: ProjectsEditorProps) {
                 </div>
             ))}
             <button
-                onClick={() => onChange([...projects, { 
-                    title: 'New Project', 
-                    description: '', 
-                    technologies: [], 
-                    repo_url: '', 
+                onClick={() => onChange([...projects, {
+                    title: 'New Project',
+                    description: '',
+                    technologies: [],
+                    repo_url: '',
                     live_url: '',
                     key_features: [],
                     technical_challenges: [],

@@ -1,6 +1,7 @@
 import React from 'react';
 import { HeroSection } from '@/types/portfolio';
 import { AutoResizeTextarea } from '@/components/ui/AutoResizeTextarea';
+import { AITextarea } from '@/components/ui/AITextarea';
 
 interface HeroEditorProps {
     data: HeroSection | null;
@@ -120,20 +121,24 @@ export function HeroEditor({ data, onChange }: HeroEditorProps) {
             </div>
             <div>
                 <label className="text-sm font-semibold text-gray-700 block mb-2">Headline</label>
-                <input
-                    type="text"
-                    value={hero.headline}
+                <AITextarea
+                    section="headline"
+                    value={hero.headline || ''}
                     onChange={e => onChange({ ...hero, headline: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition-all"
+                    onAIRewrite={(newContent) => onChange({ ...hero, headline: newContent })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition-all resize-none overflow-hidden"
                     placeholder="Software Engineer | React Enthusiast"
+                    rows={1}
                 />
             </div>
             <div>
                 <label className="text-sm font-semibold text-gray-700 block mb-2">Short Bio</label>
-                <AutoResizeTextarea
-                    value={hero.short_bio}
+                <AITextarea
+                    section="bio_short"
+                    value={hero.short_bio || ''}
                     onChange={e => onChange({ ...hero, short_bio: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition-all"
+                    onAIRewrite={(newContent) => onChange({ ...hero, short_bio: newContent })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition-all resize-none min-h-[60px]"
                     placeholder="Briefly introduce yourself..."
                     rows={2}
                 />

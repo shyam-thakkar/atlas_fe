@@ -2,6 +2,7 @@ import React from 'react';
 import { ExperienceItem } from '@/types/portfolio';
 import { DateSelector } from '@/components/ui/DateSelector';
 import { AutoResizeTextarea } from '@/components/ui/AutoResizeTextarea';
+import { AITextarea } from '@/components/ui/AITextarea';
 
 interface ExperienceEditorProps {
     data: ExperienceItem[] | null;
@@ -77,7 +78,7 @@ export function ExperienceEditor({ data, onChange }: ExperienceEditorProps) {
                                     </div>
                                 )}
                             </div>
-                            
+
                             {/* Upload/URL Input */}
                             <div className="flex-1 space-y-2">
                                 <div className="flex gap-2">
@@ -181,14 +182,21 @@ export function ExperienceEditor({ data, onChange }: ExperienceEditorProps) {
                         <label className="text-xs text-gray-500 font-bold uppercase tracking-wide block mb-1.5">
                             Summary <span className="text-gray-400 font-normal normal-case ml-1">(Each new line will be a bullet point)</span>
                         </label>
-                        <AutoResizeTextarea
+                        <AITextarea
+                            section="experience"
+                            itemIndex={i}
                             value={exp.description || ''}
                             onChange={e => {
                                 const newExp = [...experience];
                                 newExp[i] = { ...newExp[i], description: e.target.value };
                                 onChange(newExp);
                             }}
-                            className="w-full text-sm px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition-all leading-relaxed"
+                            onAIRewrite={(newContent) => {
+                                const newExp = [...experience];
+                                newExp[i] = { ...newExp[i], description: newContent };
+                                onChange(newExp);
+                            }}
+                            className="w-full text-sm px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition-all leading-relaxed resize-none min-h-[80px]"
                             placeholder="Describe your responsibilities and achievements..."
                             rows={3}
                         />
