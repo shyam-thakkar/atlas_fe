@@ -50,6 +50,56 @@ export default function DashboardPage() {
                         </div>
                     </Link>
 
+                    {/* Editor Card */}
+                    <Link
+                        href="/dashboard/editor"
+                        className="group relative overflow-hidden p-6 bg-white dark:bg-zinc-900/60 border border-gray-200 dark:border-zinc-800/50 rounded-2xl hover:border-purple-500/50 dark:hover:border-purple-500/30 hover:shadow-lg dark:hover:shadow-purple-500/5 transition-all duration-300"
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="relative">
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="p-3 bg-purple-100 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded-xl group-hover:bg-purple-600 group-hover:text-white dark:group-hover:bg-purple-500 dark:group-hover:text-white transition-colors duration-300">
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Editor</h3>
+                            </div>
+                            <p className="text-sm text-gray-500 dark:text-zinc-400">Edit and preview your portfolio in real-time.</p>
+                            <div className="mt-4 flex items-center text-sm font-medium text-purple-600 dark:text-purple-400 group-hover:translate-x-1 transition-transform duration-300">
+                                Open Editor
+                                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                            </div>
+                        </div>
+                    </Link>
+
+                    {/* AI Chat Card */}
+                    <Link
+                        href="/dashboard/chat"
+                        className="group relative overflow-hidden p-6 bg-white dark:bg-zinc-900/60 border border-gray-200 dark:border-zinc-800/50 rounded-2xl hover:border-emerald-500/50 dark:hover:border-emerald-500/30 hover:shadow-lg dark:hover:shadow-emerald-500/5 transition-all duration-300"
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="relative">
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="p-3 bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl group-hover:bg-emerald-600 group-hover:text-white dark:group-hover:bg-emerald-500 dark:group-hover:text-white transition-colors duration-300">
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">AI Chat</h3>
+                            </div>
+                            <p className="text-sm text-gray-500 dark:text-zinc-400">Test your portfolio chatbot and update its knowledge.</p>
+                            <div className="mt-4 flex items-center text-sm font-medium text-emerald-600 dark:text-emerald-400 group-hover:translate-x-1 transition-transform duration-300">
+                                Start Chat
+                                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                            </div>
+                        </div>
+                    </Link>
+
                     {/* Profile Card */}
                     <Link
                         href="/dashboard/profile"
@@ -68,57 +118,6 @@ export default function DashboardPage() {
                             <p className="text-sm text-gray-500 dark:text-zinc-400">Manage your account settings and personal information.</p>
                             <div className="mt-4 flex items-center text-sm font-medium text-indigo-600 dark:text-indigo-400 group-hover:translate-x-1 transition-transform duration-300">
                                 View details
-                                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                            </div>
-                        </div>
-                    </Link>
-
-                    {/* Portfolio Card */}
-                    <Link
-                        href="/dashboard/portfolio"
-                        className="group relative overflow-hidden p-6 bg-white dark:bg-zinc-900/60 border border-gray-200 dark:border-zinc-800/50 rounded-2xl hover:border-purple-500/50 dark:hover:border-purple-500/30 hover:shadow-lg dark:hover:shadow-purple-500/5 transition-all duration-300"
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        <div className="relative">
-                            <div className="flex items-center gap-4 mb-4">
-                                <div className="p-3 bg-purple-100 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded-xl group-hover:bg-purple-600 group-hover:text-white dark:group-hover:bg-purple-500 dark:group-hover:text-white transition-colors duration-300">
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                                    </svg>
-                                </div>
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Edit Portfolio</h3>
-                            </div>
-                            <p className="text-sm text-gray-500 dark:text-zinc-400">Customize and edit your AI-generated portfolio sections.</p>
-                            <div className="mt-4 flex items-center text-sm font-medium text-purple-600 dark:text-purple-400 group-hover:translate-x-1 transition-transform duration-300">
-                                Customize
-                                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                            </div>
-                        </div>
-                    </Link>
-
-                    {/* Preview Card */}
-                    <Link
-                        href="/dashboard/portfolio/preview"
-                        className="group relative overflow-hidden p-6 bg-white dark:bg-zinc-900/60 border border-gray-200 dark:border-zinc-800/50 rounded-2xl hover:border-emerald-500/50 dark:hover:border-emerald-500/30 hover:shadow-lg dark:hover:shadow-emerald-500/5 transition-all duration-300"
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        <div className="relative">
-                            <div className="flex items-center gap-4 mb-4">
-                                <div className="p-3 bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl group-hover:bg-emerald-600 group-hover:text-white dark:group-hover:bg-emerald-500 dark:group-hover:text-white transition-colors duration-300">
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                </div>
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Preview Portfolio</h3>
-                            </div>
-                            <p className="text-sm text-gray-500 dark:text-zinc-400">See how your portfolio looks before publishing it live.</p>
-                            <div className="mt-4 flex items-center text-sm font-medium text-emerald-600 dark:text-emerald-400 group-hover:translate-x-1 transition-transform duration-300">
-                                Preview
                                 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                 </svg>

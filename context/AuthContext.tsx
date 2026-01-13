@@ -12,6 +12,7 @@ interface AuthContextType {
     signupAndLogin: (email: string, password: string, name: string) => Promise<void>;
     loginWithGoogle: () => void; // Changed: no idToken needed, just redirects
     logout: () => void;
+    refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -171,7 +172,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             login,
             signupAndLogin,
             loginWithGoogle,
-            logout
+            logout,
+            refreshUser: checkUser
         }}>
             {children}
         </AuthContext.Provider>

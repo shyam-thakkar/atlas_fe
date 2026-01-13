@@ -52,7 +52,42 @@ const tiers = [
     }
 ];
 
+import { useRouter } from 'next/navigation';
+import { useRazorpay } from '@/hooks/useRazorpay';
+import { useAuth } from '@/context/AuthContext';
+import { Loader2 } from 'lucide-react';
+
+import { PaymentStatusModal } from './payment/PaymentStatusModal';
+
 export function LandingPricing() {
+    const router = useRouter();
+    const { initiatePayment, isLoading, paymentStatus, paymentMessage, resetStatus } = useRazorpay();
+    const { user } = useAuth();
+
+    const handlePlanSelection = async (tier: any) => {
+        if (tier.name === "Free") {
+            router.push('/signup');
+            return;
+        }
+
+        if (!user) {
+            router.push('/login?redirect=/');
+            return;
+        }
+
+        // Determine plan type
+        let planType = '';
+        if (tier.name === "Pro") {
+            planType = "pro_monthly";
+        } else if (tier.name === "Lifetime") {
+            planType = "lifetime";
+        }
+
+        if (planType) {
+            await initiatePayment(planType);
+        }
+    };
+
     return (
         <section id="pricing" className="py-12 bg-white dark:bg-zinc-950 overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -105,16 +140,30 @@ export function LandingPricing() {
                                 ))}
                             </ul>
 
-                            <button className={`w-full py-4 rounded-2xl font-bold transition-all ${tier.highlight
-                                ? 'bg-violet-600 hover:bg-violet-700 text-white shadow-xl shadow-violet-500/30'
-                                : 'bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-900 dark:text-white'
-                                }`}>
+                            <button
+                                onClick={() => handlePlanSelection(tier)}
+                                disabled={isLoading}
+                                className={`w-full py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 ${tier.highlight
+                                    ? 'bg-violet-600 hover:bg-violet-700 text-white shadow-xl shadow-violet-500/30'
+                                    : 'bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-900 dark:text-white'
+                                    } disabled:opacity-70 disabled:cursor-not-allowed`}
+                            >
+                                {isLoading ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : null}
                                 {tier.cta}
                             </button>
                         </div>
                     ))}
                 </div>
             </div>
+
+            <PaymentStatusModal
+                isOpen={paymentStatus !== 'idle'}
+                status={paymentStatus}
+                message={paymentMessage}
+                onClose={resetStatus}
+            />
         </section>
     );
 }

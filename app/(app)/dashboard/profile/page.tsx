@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { PaymentButton } from '@/components/payment/PaymentButton';
 
 export default function ProfileDetailsPage() {
     const { user } = useAuth();
@@ -137,13 +138,121 @@ export default function ProfileDetailsPage() {
                                 </div>
                                 <div className="p-4 bg-gray-50 dark:bg-zinc-800/30 rounded-xl">
                                     <dt className="text-xs font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider">Plan Status</dt>
-                                    <dd className="mt-2 text-sm text-gray-900 dark:text-white flex items-center gap-2">
-                                        <div className="p-1.5 bg-emerald-100 dark:bg-emerald-500/10 rounded-lg">
-                                            <svg className="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                            </svg>
+                                    <dd className="mt-2 text-sm text-gray-900 dark:text-white">
+                                        <div className="flex items-center gap-2">
+                                            <div className="p-1.5 bg-emerald-100 dark:bg-emerald-500/10 rounded-lg">
+                                                <svg className="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </div>
+                                            <span className="capitalize">{(user?.user_tier || user?.tier || 'Beta')} Tier</span>
+                                            <div className="ml-auto">
+                                                {(() => {
+                                                    const currentTier = (user?.user_tier || user?.tier || 'free').toLowerCase();
+                                                    let targetPlan = '';
+                                                    let buttonText = '';
+
+                                                    if (currentTier === 'pro') {
+                                                        targetPlan = 'lifetime';
+                                                        buttonText = 'Get Lifetime';
+                                                    } else if (currentTier !== 'lifetime' && currentTier !== 'enterprise') {
+                                                        targetPlan = 'pro_monthly';
+                                                        buttonText = 'Upgrade to Pro';
+                                                    }
+
+                                                    if (!targetPlan) return null;
+
+                                                    return (
+                                                        <PaymentButton planType={targetPlan} className="text-xs px-3 py-1.5 h-auto whitespace-nowrap">
+                                                            {buttonText}
+                                                        </PaymentButton>
+                                                    );
+                                                })()}
+                                            </div>
                                         </div>
-                                        <span className="capitalize">{(user?.user_tier || user?.tier || 'Beta')} Tier</span>
+                                        
+                                        {/* Subscription Expiry Info */}
+                                        {(() => {
+                                            const currentTier = (user?.user_tier || user?.tier || 'free').toLowerCase();
+                                            const expiryDate = user?.subscription_expiry;
+
+                                            // Only show for Pro users
+                                            if (currentTier !== 'pro') return null;
+
+                                            // If no expiry date, show active subscription status
+                                            if (!expiryDate) {
+                                                return (
+                                                    <div className="mt-3 p-3 rounded-lg text-xs bg-violet-100 dark:bg-violet-500/10 text-violet-700 dark:text-violet-400 border border-violet-200 dark:border-violet-500/20">
+                                                        <div className="flex items-center justify-between gap-2">
+                                                            <div className="flex items-center gap-2">
+                                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                                </svg>
+                                                                <span>Pro subscription active</span>
+                                                            </div>
+                                                            <PaymentButton planType="pro_monthly" className="text-xs px-3 py-1 h-auto">
+                                                                Renew
+                                                            </PaymentButton>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }
+
+                                            const expiry = new Date(expiryDate);
+                                            const now = new Date();
+                                            const diffTime = expiry.getTime() - now.getTime();
+                                            const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                            const isExpiringSoon = daysLeft <= 7 && daysLeft > 0;
+                                            const isExpired = daysLeft <= 0;
+
+                                            return (
+                                                <div className={`mt-3 p-3 rounded-lg text-xs ${
+                                                    isExpired 
+                                                        ? 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-500/20' 
+                                                        : isExpiringSoon 
+                                                            ? 'bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20' 
+                                                            : 'bg-violet-100 dark:bg-violet-500/10 text-violet-700 dark:text-violet-400 border border-violet-200 dark:border-violet-500/20'
+                                                }`}>
+                                                    {isExpired ? (
+                                                        <div className="flex items-center justify-between gap-2">
+                                                            <div className="flex items-center gap-2">
+                                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                                </svg>
+                                                                <span className="font-medium">Your Pro subscription has expired.</span>
+                                                            </div>
+                                                            <PaymentButton planType="pro_monthly" className="text-xs px-3 py-1 h-auto bg-red-600 hover:bg-red-700 from-red-600 to-red-600">
+                                                                Renew Now
+                                                            </PaymentButton>
+                                                        </div>
+                                                    ) : isExpiringSoon ? (
+                                                        <div className="flex items-center justify-between gap-2">
+                                                            <div className="flex items-center gap-2">
+                                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                </svg>
+                                                                <span className="font-medium">Expires in {daysLeft} day{daysLeft !== 1 ? 's' : ''}!</span>
+                                                            </div>
+                                                            <PaymentButton planType="pro_monthly" className="text-xs px-3 py-1 h-auto bg-amber-600 hover:bg-amber-700 from-amber-600 to-amber-600">
+                                                                Renew
+                                                            </PaymentButton>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex items-center justify-between gap-2">
+                                                            <div className="flex items-center gap-2">
+                                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                                </svg>
+                                                                <span>{daysLeft} day{daysLeft !== 1 ? 's' : ''} remaining</span>
+                                                            </div>
+                                                            <PaymentButton planType="pro_monthly" className="text-xs px-3 py-1 h-auto">
+                                                                Renew
+                                                            </PaymentButton>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })()}
                                     </dd>
                                 </div>
                                 <div className="p-4 bg-gray-50 dark:bg-zinc-800/30 rounded-xl">

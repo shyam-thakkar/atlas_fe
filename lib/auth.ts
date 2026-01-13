@@ -6,9 +6,11 @@ export interface UserResponse {
   id?: number | string;
   profile_image?: string;
   resume_process_count?: number;
-  user_tier?: 'beta' | 'free' | 'pro' | 'enterprise';
+  user_tier?: 'beta' | 'free' | 'pro' | 'enterprise' | 'lifetime';
+  plan_type?: 'pro_monthly' | 'lifetime' | null;
+  subscription_expiry?: string | null; // ISO date string
   authentication_method?: string;
-  tier?: 'beta' | 'free' | 'pro' | 'enterprise'; // Deprecated in favor of user_tier
+  tier?: 'beta' | 'free' | 'pro' | 'enterprise' | 'lifetime'; // Deprecated in favor of user_tier
 }
 
 export interface AuthResponse {
