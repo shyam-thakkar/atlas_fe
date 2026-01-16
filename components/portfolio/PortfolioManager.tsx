@@ -71,12 +71,13 @@ export function PortfolioManager({ onFinish, isModal = false, onDataChange, defa
                 setEditedData(data); // Initialize edited data
             })
             .catch((err) => {
-                console.error("Failed to load portfolio", err);
                 if (err.message?.includes('409') || err.status === 409) {
                     setError("Processing not finished. Please wait for the analysis to complete.");
                 } else if (err.status === 404) {
                     setError("No resume found. Please upload a resume first to generate your portfolio.");
                 } else {
+                    // Only log unexpected errors
+                    console.error("Failed to load portfolio", err);
                     setError("Failed to load portfolio data. Please try again.");
                 }
             })
@@ -274,13 +275,13 @@ export function PortfolioManager({ onFinish, isModal = false, onDataChange, defa
                     ) : error ? (
                         <div className="h-full flex items-center justify-center">
                             {error.includes('resume') ? (
-                                <div className="max-w-md text-center p-8 bg-indigo-50 rounded-2xl border border-indigo-100">
-                                    <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                                <div className="max-w-md text-center p-8 bg-indigo-50 dark:bg-zinc-900 rounded-2xl border border-indigo-100 dark:border-zinc-700">
+                                    <div className="w-12 h-12 bg-indigo-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <svg className="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
                                     </div>
-                                    <h3 className="text-lg font-bold text-indigo-900 mb-2">Resume Required</h3>
-                                    <p className="text-indigo-700 mb-6 text-sm">Please upload your resume to generate your portfolio data.</p>
-                                    <a href="/dashboard/resume" className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white font-medium text-sm rounded-lg hover:bg-indigo-700 transition-colors shadow-sm cursor-pointer">
+                                    <h3 className="text-lg font-bold text-indigo-900 dark:text-indigo-300 mb-2">Resume Required</h3>
+                                    <p className="text-indigo-700 dark:text-zinc-400 mb-6 text-sm">Please upload your resume to generate your portfolio data.</p>
+                                    <a href="/dashboard/resume" className="inline-flex items-center px-4 py-2 bg-indigo-600 dark:bg-indigo-500 text-white font-medium text-sm rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors shadow-sm cursor-pointer">
                                         Go to Resume Upload
                                     </a>
                                 </div>

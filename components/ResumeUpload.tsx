@@ -18,7 +18,7 @@ export function ResumeUpload({ onUploadSuccess, hasExistingResume }: ResumeUploa
 
   const getTierLimits = (tier?: string) => {
     switch (tier) {
-      case 'free': return 3;
+      case 'free': return 5;
       case 'pro': return 50;
       case 'enterprise': return Infinity;
       case 'beta':

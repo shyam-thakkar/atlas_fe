@@ -20,7 +20,7 @@ const tiers = [
     },
     {
         name: "Pro",
-        price: "149",
+        price: "49",
         period: "/month",
         description: "For professionals who want to stand out and land their dream job.",
         features: [

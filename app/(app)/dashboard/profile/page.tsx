@@ -267,7 +267,7 @@ export default function ProfileDetailsPage() {
                                             const tier = user?.user_tier || user?.tier;
                                             const limit = tier === 'enterprise' ? Infinity :
                                                 tier === 'pro' ? 50 :
-                                                    tier === 'free' ? 3 : 5; // Default Beta
+                                                    tier === 'free' ? 5 : 5; // Default Beta
                                             const usage = user?.resume_process_count || 0;
                                             return (
                                                 <span>

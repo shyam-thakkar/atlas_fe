@@ -44,13 +44,13 @@ export default function PortfolioPreviewPage() {
         try {
             const data = await publish.getPublicPortfolio(username);
             console.log('Live portfolio API response:', data);
-            
+
             // The API returns the portfolio data directly at the root level
             // Check if data has portfolio fields directly (hero, projects, etc.)
             // or if it's nested under a 'portfolio' key
             let portfolioData: any;
             const rawData = data as any;
-            
+
             if (rawData.hero && rawData.projects) {
                 // Data is at root level (direct portfolio structure)
                 portfolioData = data;
@@ -64,7 +64,7 @@ export default function PortfolioPreviewPage() {
                 // Fallback - treat response as portfolio data
                 portfolioData = data;
             }
-            
+
             // If portfolio is a string (JSON), parse it
             if (typeof portfolioData === 'string') {
                 try {
@@ -73,7 +73,7 @@ export default function PortfolioPreviewPage() {
                     console.error('Failed to parse portfolio JSON:', e);
                 }
             }
-            
+
             console.log('Parsed portfolio data:', portfolioData);
             setLiveData(portfolioData as StructuredPortfolio);
         } catch (err: any) {
@@ -135,11 +135,10 @@ export default function PortfolioPreviewPage() {
                 <div className="inline-flex bg-gray-200 dark:bg-zinc-800 rounded-xl p-1">
                     <button
                         onClick={() => setPreviewMode('draft')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                            previewMode === 'draft'
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${previewMode === 'draft'
                                 ? 'bg-white dark:bg-zinc-700 text-gray-900 dark:text-white shadow-sm'
                                 : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
-                        }`}
+                            }`}
                     >
                         <span className="flex items-center gap-2">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,11 +149,10 @@ export default function PortfolioPreviewPage() {
                     </button>
                     <button
                         onClick={() => setPreviewMode('live')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                            previewMode === 'live'
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${previewMode === 'live'
                                 ? 'bg-white dark:bg-zinc-700 text-gray-900 dark:text-white shadow-sm'
                                 : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
-                        }`}
+                            }`}
                     >
                         <span className="flex items-center gap-2">
                             <span className={`w-2 h-2 rounded-full ${isPublished ? 'bg-green-500' : 'bg-gray-400'}`} />
@@ -172,7 +170,7 @@ export default function PortfolioPreviewPage() {
                             </span>
                         </div>
                     )}
-                    
+
                     {isPublished && (
                         <button
                             onClick={openLivePortfolio}
@@ -197,13 +195,12 @@ export default function PortfolioPreviewPage() {
                         <div className="w-3 h-3 rounded-full bg-green-400"></div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold transition-colors duration-300 ${
-                            previewMode === 'draft'
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold transition-colors duration-300 ${previewMode === 'draft'
                                 ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400'
                                 : isPublished
                                     ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400'
                                     : 'bg-gray-100 dark:bg-zinc-700 text-gray-600 dark:text-zinc-400'
-                        }`}>
+                            }`}>
                             {previewMode === 'draft' ? 'DRAFT PREVIEW' : isPublished ? 'LIVE' : 'NOT PUBLISHED'}
                         </span>
                         <span className={`text-xs font-mono ${chromeLabelClasses} transition-colors duration-300`}>
@@ -220,7 +217,7 @@ export default function PortfolioPreviewPage() {
                         src="/portfolio-preview?mode=preview"
                         className="w-full flex-1 border-0 bg-white"
                         title="Portfolio Draft Preview"
-                        sandbox="allow-scripts allow-same-origin"
+                        sandbox="allow-scripts allow-same-origin allow-top-navigation"
                     />
                 ) : (
                     // Live Preview - iframe or placeholder

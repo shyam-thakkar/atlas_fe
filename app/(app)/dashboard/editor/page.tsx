@@ -26,7 +26,7 @@ export default function PortfolioPlayground() {
                 setIframeTheme(event.data.isDark ? 'dark' : 'light');
             }
         };
-        
+
         window.addEventListener('message', handleMessage);
         return () => window.removeEventListener('message', handleMessage);
     }, []);
@@ -72,7 +72,7 @@ export default function PortfolioPlayground() {
                             src="/portfolio-preview"
                             className="w-full flex-1 border-0"
                             title="Portfolio Preview"
-                            sandbox="allow-scripts allow-same-origin"
+                            sandbox="allow-scripts allow-same-origin allow-top-navigation"
                         />
                     </div>
                 </div>
