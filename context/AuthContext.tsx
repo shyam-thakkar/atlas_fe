@@ -60,10 +60,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const publicRoutes = ['/', '/login', '/signup'];
         const isPublicRoute = publicRoutes.includes(pathname);
+        
+        // Admin routes handle their own authentication
+        const isAdminRoute = pathname.startsWith('/admin');
 
         // Client-side route protection
         // If we have no token and are on a protected route, redirect
         const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+
+        // Skip auth handling for admin routes - they have their own auth flow
+        if (isAdminRoute) {
+            checkUser();
+            return;
+        }
 
         if (!token && !isPublicRoute) {
             setIsLoading(false);
@@ -79,6 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         checkUser();
     }, [pathname]); // Depend on pathname to re-check if user navigates to protected route manually
+
 
     // Event Listeners for Logout Sync
     useEffect(() => {

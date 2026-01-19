@@ -19,17 +19,43 @@ export function middleware(request: NextRequest) {
     
     // If it matches our portfolio domain and has a valid subdomain
     if (potentialDomain === PORTFOLIO_DOMAIN && subdomain && subdomain !== 'www') {
+      
+      // Handle 'admin' subdomain
+      if (subdomain === 'admin') {
+        const path = request.nextUrl.pathname;
+        // If path already starts with /admin, pass it through
+        if (path.startsWith('/admin')) {
+          return NextResponse.next();
+        }
+        // Otherwise rewrite to /admin prefix
+        // e.g. admin.aifolio.in/login -> /admin/login
+        const url = new URL(`/admin${path === '/' ? '' : path}`, request.url);
+        return NextResponse.rewrite(url);
+      }
+
       // Rewrite to the portfolio page with the username
+      // (excluding admin from being treated as a username)
       const url = new URL(`/portfolio/${subdomain}`, request.url);
       return NextResponse.rewrite(url);
     }
   }
-  
+
   // For development: Also check for localhost subdomains (username.localhost:3000)
   // This allows testing subdomain routing locally with /etc/hosts modifications
   if (hostname.includes('localhost') && domainParts.length >= 2) {
     const subdomain = domainParts[0];
     if (subdomain !== 'localhost' && subdomain !== 'www') {
+      
+      // Handle 'admin' subdomain locally
+      if (subdomain === 'admin') {
+        const path = request.nextUrl.pathname;
+        if (path.startsWith('/admin')) {
+          return NextResponse.next();
+        }
+        const url = new URL(`/admin${path === '/' ? '' : path}`, request.url);
+        return NextResponse.rewrite(url);
+      }
+
       const url = new URL(`/portfolio/${subdomain}`, request.url);
       return NextResponse.rewrite(url);
     }

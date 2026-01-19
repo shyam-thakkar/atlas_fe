@@ -11,6 +11,7 @@ export interface UserResponse {
   subscription_expiry?: string | null; // ISO date string
   authentication_method?: string;
   tier?: 'beta' | 'free' | 'pro' | 'enterprise' | 'lifetime'; // Deprecated in favor of user_tier
+  is_staff?: boolean;
 }
 
 export interface AuthResponse {
