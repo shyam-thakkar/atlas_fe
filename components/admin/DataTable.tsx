@@ -30,7 +30,7 @@ interface DataTableProps<T> {
 
 export function DataTable<T>({
   columns,
-  data,
+  data = [],
   loading = false,
   totalCount = 0,
   page = 1,

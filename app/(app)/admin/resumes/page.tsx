@@ -127,7 +127,7 @@ export default function ResumesPage() {
             {/* Table */}
             <DataTable
                 columns={columns}
-                data={resumes.results}
+                data={resumes?.results || []}
                 loading={loading}
                 totalCount={resumes.count}
                 page={page}

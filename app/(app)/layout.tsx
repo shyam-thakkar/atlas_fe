@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
@@ -57,7 +58,10 @@ export default function RootLayout({
           enableSystem
         >
           <AuthProvider>
-            <script src="https://checkout.razorpay.com/v1/checkout.js" async />
+            <Script
+              src="https://checkout.razorpay.com/v1/checkout.js"
+              strategy="lazyOnload"
+            />
             {children}
           </AuthProvider>
         </ThemeProvider>

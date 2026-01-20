@@ -5,7 +5,7 @@ export const siteConfig = {
   name: 'AIFolio',
   tagline: 'AI Portfolio Builder',
   description: 'Transform your resume into a stunning portfolio with AI. AIFolio uses artificial intelligence to create professional, personalized portfolios in minutes.',
-  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://aifolio.in',
+  url: process.env.NEXT_PUBLIC_SITE_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://aifolio.in'),
   ogImage: '/og-image.png',
   twitterHandle: '@aifolio',
   keywords: [
